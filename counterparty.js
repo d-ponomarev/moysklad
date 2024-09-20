@@ -18,7 +18,7 @@ module.exports = async (req, res) => {
     }
 
     try {
-      const counterparty = await axios.get(
+      const counterpartyReponse = await axios.get(
         `https://api.moysklad.ru/api/remap/1.2/entity/counterparty/${search}`,
         {
           headers: {
@@ -27,6 +27,8 @@ module.exports = async (req, res) => {
           },
         }
       );
+
+      const counterparty = counterpartyReponse.data;
 
       if (counterparty.id) {
         res.status(200).json({
@@ -49,7 +51,7 @@ module.exports = async (req, res) => {
     const { meta } = req.body;
 
     try {
-      const counterpartybebra = await axios.get(
+      const counterpartyReponse = await axios.get(
         `https://api.moysklad.ru/api/remap/1.2/entity/counterparty/${meta.id}`,
         {
           headers: {
@@ -59,13 +61,15 @@ module.exports = async (req, res) => {
         }
       );
 
-      if (counterpartybebra.id) {
+      const counterparty = counterpartyReponse.data;
+
+      if (counterparty.id) {
         let bonusField = null;
         if (
-            counterpartybebra.attributes &&
-            counterpartybebra.attributes.length > 0
+            counterparty.attributes &&
+            counterparty.attributes.length > 0
         ) {
-          bonusField = counterpartybebra.attributes.find(
+          bonusField = counterparty.attributes.find(
             (attr) => attr.name === "Бонусы"
           );
         }
@@ -76,7 +80,6 @@ module.exports = async (req, res) => {
           },
         });
       } else {
-        console.log(counterpartybebra);
         res.status(404).json({ error: "Контрагент не найден" });
       }
     } catch (error) {
