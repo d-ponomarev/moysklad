@@ -125,7 +125,7 @@ module.exports = async (req, res) => {
         console.error("Ошибка при запросе к API МойСклад:", error);
         res.status(500).json({ error: "Ошибка при запросе к API МойСклад"});
       }
-  } else if (url ==="/retaildemand" && method === "POST") {
+  } else if (url === "/retaildemand" && method === "POST") {
     const { meta } = req.body;
     console.log(meta);
     res.status(200).json({meta});
