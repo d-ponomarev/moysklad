@@ -79,8 +79,8 @@ module.exports = async (req, res) => {
         res.status(404).json({ error: "Контрагент не найден" });
       }
     } catch (error) {
-      console.error("Ошибка при запросе к API МойСклад:", error);
-      res.status(500).json({ error: meta});
+      console.error("Ошибка при запросе к API МойСклад:", meta);
+      res.status(500).json({ error: "Ошибка при запросе к API МойСклад",});
     }
   } else {
     res.status(404).json({ error: "Маршрут не найден" });
