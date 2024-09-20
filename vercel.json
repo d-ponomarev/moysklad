@@ -1,17 +1,36 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "counterparty.js",
-        "use": "@vercel/node"
-      }
-    ],
-    "routes": [
-      {
-        "src": "/counterparty/detail",
-        "dest": "/counterparty.js",
-        "methods": ["POST"]
-      }
-    ]
-  }
-  
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/index.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/counterparty/detail",
+      "dest": "/api/index.js",
+      "methods": ["POST"]
+    },
+    {
+      "src": "/retaildemand/recalc",
+      "dest": "/api/index.js",
+      "methods": ["POST"]
+    },
+    {
+      "src": "/retaildemand/create",
+      "dest": "/api/index.js",
+      "methods": ["POST"]
+    },
+    {
+      "src": "/test",
+      "dest": "/api/index.js",
+      "methods": ["GET"]
+    },
+    {
+      "src": "/counterparty",
+      "dest": "/api/index.js",
+      "methods": ["GET"]
+    }
+  ]
+}
