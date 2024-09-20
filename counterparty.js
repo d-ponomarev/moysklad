@@ -86,6 +86,49 @@ module.exports = async (req, res) => {
       console.error("Ошибка при запросе к API МойСклад:", error);
       res.status(500).json({ error: "Ошибка при запросе к API МойСклад"});
     }
+  } else if (url === "/retaildemand/recalc" && method === "POST") {
+    const { meta } = req.body;
+    
+    try {
+        const counterpartyReponse = await axios.get(
+          `https://api.moysklad.ru/api/remap/1.2/entity/counterparty/${meta.agent.meta.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${TOKEN}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+  
+        const counterparty = counterpartyReponse.data;
+  
+        if (counterparty.id) {
+          let tags = counterparty.tags;
+          if (
+              counterparty.attributes &&
+              counterparty.attributes.length > 0
+          ) {
+            bonusField = counterparty.attributes.find(
+              (attr) => attr.name === "Бонусы"
+            );
+          }
+  
+          res.status(200).json({
+            bonusProgram: {
+              agentBonusBalance: bonusField.value,
+            },
+          });
+        } else {
+          res.status(404).json({ error: "Контрагент не найден" });
+        }
+      } catch (error) {
+        console.error("Ошибка при запросе к API МойСклад:", error);
+        res.status(500).json({ error: "Ошибка при запросе к API МойСклад"});
+      }
+  } else if (url ==="/retaildemand" && method === "POST") {
+    const { meta } = req.body;
+    console.log(meta);
+    res.status(200).json({meta});
   } else {
     res.status(404).json({ error: "Маршрут не найден" });
   }
