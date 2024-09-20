@@ -10,7 +10,7 @@ const verifyAuthToken = (req, res, next) => {
   if (req.path === "/retaildemand/create") {
     return next();
   }
-  
+
   const authToken = req.headers["lognex-discount-api-auth-token"];
   if (authToken !== "123") {
     return res.status(401).json({ error: "Неверный токен авторизации" });
@@ -137,13 +137,9 @@ app.post("/retaildemand/recalc", async (req, res) => {
 
 app.post("/retaildemand/create", (req, res) => {
   const { meta } = req.body;
-  console.log("meta:", meta);
+  console.log("meta:", meta.events);
 
-  res.status(200).json({ meta: meta });
-});
-
-app.get("/test", (req, res) => {
-  res.status(200).json({ message: "success" });
+  res.status(200).json({ meta: meta.events });
 });
 
 const port = process.env.PORT || 3000;
