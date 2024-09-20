@@ -1,0 +1,16 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "counterparty.js",
+        "use": "@vercel/node"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/counterparty",
+        "dest": "/counterparty.js"
+      }
+    ]
+  }
+  
