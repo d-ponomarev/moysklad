@@ -137,9 +137,9 @@ app.post("/retaildemand/recalc", async (req, res) => {
 
 app.post("/retaildemand/create", (req, res) => {
   const { data } = req;
-  console.log("data:", data.events);
+  console.log("data:", data);
 
-  res.status(200).json({ data: data.events });
+  res.status(200).json({ data: data });
 });
 
 const port = process.env.PORT || 3000;
