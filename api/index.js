@@ -136,10 +136,10 @@ app.post("/retaildemand/recalc", async (req, res) => {
 });
 
 app.post("/retaildemand/create", (req, res) => {
-  const { meta } = req.body;
-  console.log("meta:", meta.events);
+  const { data } = req;
+  console.log("data:", data.events);
 
-  res.status(200).json({ meta: meta.events });
+  res.status(200).json({ data: data.events });
 });
 
 const port = process.env.PORT || 3000;
