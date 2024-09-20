@@ -80,7 +80,7 @@ module.exports = async (req, res) => {
       }
     } catch (error) {
       console.error("Ошибка при запросе к API МойСклад:", error);
-      res.status(500).json({ error: "Ошибка при запросе к API МойСклад" });
+      res.status(500).json({ error: meta});
     }
   } else {
     res.status(404).json({ error: "Маршрут не найден" });
