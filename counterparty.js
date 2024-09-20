@@ -7,7 +7,7 @@ module.exports = (req, res) => {
       return res.status(400).json({ error: 'Content-Type должен быть application/json' });
     }
   
-    if (authToken !== 'Токен авторизации') {
+    if (authToken !== '123') {
       return res.status(401).json({ error: 'Неверный токен авторизации' });
     }
   
