@@ -7,5 +7,8 @@
     "start": "node counterparty.js"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.7.7"
+  }
 }
