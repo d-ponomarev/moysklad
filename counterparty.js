@@ -49,7 +49,7 @@ module.exports = async (req, res) => {
     const { meta } = req.body;
 
     try {
-      const counterparty = await axios.get(
+      const counterpartybebra = await axios.get(
         `https://api.moysklad.ru/api/remap/1.2/entity/counterparty/${meta.id}`,
         {
           headers: {
@@ -59,13 +59,13 @@ module.exports = async (req, res) => {
         }
       );
 
-      if (counterparty.id) {
+      if (counterpartybebra.id) {
         let bonusField = null;
         if (
-            counterparty.attributes &&
-            counterparty.attributes.length > 0
+            counterpartybebra.attributes &&
+            counterpartybebra.attributes.length > 0
         ) {
-          bonusField = counterparty.attributes.find(
+          bonusField = counterpartybebra.attributes.find(
             (attr) => attr.name === "Бонусы"
           );
         }
@@ -76,6 +76,7 @@ module.exports = async (req, res) => {
           },
         });
       } else {
+        console.log(counterpartybebra);
         res.status(404).json({ error: "Контрагент не найден" });
       }
     } catch (error) {
