@@ -4,7 +4,7 @@
   "description": "",
   "main": "counterparty.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node counterparty.js"
   },
   "author": "",
   "license": "ISC"
