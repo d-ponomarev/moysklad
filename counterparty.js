@@ -125,10 +125,10 @@ module.exports = async (req, res) => {
         console.error("Ошибка при запросе к API МойСклад:", error);
         res.status(500).json({ error: "Ошибка при запросе к API МойСклад"});
       }
-  } else if (url === "/retaildemand" && method === "POST") {
+  } else if (url === "/retaildemand/create" && method === "POST") {
     const { meta } = req.body;
     console.log(meta);
-    res.status(200).json({meta});
+    res.status(200).json({meta: meta});
   } else {
     res.status(404).json({ error: "Маршрут не найден" });
   }
