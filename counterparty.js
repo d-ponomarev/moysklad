@@ -50,7 +50,7 @@ module.exports = async (req, res) => {
 
     try {
       const counterparty = await axios.get(
-        `https://api.moysklad.ru/api/remap/1.2/entity/counterparty/${meta.meta.id}`,
+        `https://api.moysklad.ru/api/remap/1.2/entity/counterparty/${meta.id}`,
         {
           headers: {
             Authorization: `Bearer ${TOKEN}`,
@@ -79,7 +79,7 @@ module.exports = async (req, res) => {
         res.status(404).json({ error: "Контрагент не найден" });
       }
     } catch (error) {
-      console.error("Ошибка при запросе к API МойСклад:", meta);
+      console.error("Ошибка при запросе к API МойСклад:", error);
       res.status(500).json({ error: "Ошибка при запросе к API МойСклад"});
     }
   } else {
