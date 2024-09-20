@@ -135,9 +135,45 @@ app.post("/retaildemand/recalc", async (req, res) => {
   }
 });
 
-app.post("/retaildemand/create", (req, res) => {
+app.post("/retaildemand/create", async (req, res) => {
   const { body } = req;
-  console.log("body:", body);
+
+  if (!body.events || !body.events[0] || !body.events[0].meta || !body.events[0].meta.href) {
+    return;
+  }
+
+  try {
+    const orderUrl = body.events[0].meta.href;
+    const orderResponse = await axios.get(orderUrl, {
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+        "Accept-Encoding": "gzip",
+        "Content-Type": "application/json"
+      }
+    });
+
+    const orderData = orderResponse.data;
+
+    const counterpartyUrl = orderData.agent.meta.href;
+    const counterpartyResponse = await axios.get(counterpartyUrl, {
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+        "Accept-Encoding": "gzip",
+        "Content-Type": "application/json"
+      }
+    });
+
+    const counterpartyData = counterpartyResponse.data;
+
+    console.log(counterpartyData);
+    res.status(200).json({ counterpartyData });
+
+  } catch (error) {
+    console.error("Ошибка при запросе к API МойСклад:", error);
+    res.status(500).json({ error: "Ошибка при запросе к API МойСклад" });
+  }
+
+  const orderUrl = body.events[0].meta.href;
 
   res.status(200).json({ body: body });
 });
