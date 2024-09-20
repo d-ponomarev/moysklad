@@ -136,10 +136,10 @@ app.post("/retaildemand/recalc", async (req, res) => {
 });
 
 app.post("/retaildemand/create", (req, res) => {
-  const { data } = req;
-  console.log("data:", data);
+  const { body } = req;
+  console.log("body:", body);
 
-  res.status(200).json({ data: data });
+  res.status(200).json({ body: body });
 });
 
 const port = process.env.PORT || 3000;
