@@ -8,8 +8,9 @@
     ],
     "routes": [
       {
-        "src": "/counterparty",
-        "dest": "/counterparty.js"
+        "src": "/counterparty/detail",
+        "dest": "/counterparty.js",
+        "methods": ["POST"]
       }
     ]
   }
