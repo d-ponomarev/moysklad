@@ -62,10 +62,10 @@ module.exports = async (req, res) => {
       if (counterparty.id) {
         let bonusField = null;
         if (
-          counterpartyDetails.attributes &&
-          counterpartyDetails.attributes.length > 0
+            counterparty.attributes &&
+            counterparty.attributes.length > 0
         ) {
-          bonusField = counterpartyDetails.attributes.find(
+          bonusField = counterparty.attributes.find(
             (attr) => attr.name === "Бонусы"
           );
         }
