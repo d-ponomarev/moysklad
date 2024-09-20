@@ -3,10 +3,6 @@ module.exports = (req, res) => {
     const contentType = req.headers['content-type'];
     const authToken = req.headers['lognex-discount-api-auth-token'];
   
-    if (contentType !== 'application/json') {
-      return res.status(400).json({ error: 'Content-Type должен быть application/json' });
-    }
-  
     if (authToken !== '123') {
       return res.status(401).json({ error: 'Неверный токен авторизации' });
     }
