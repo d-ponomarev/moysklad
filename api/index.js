@@ -357,7 +357,8 @@ app.post("/retaildemand/recalc", (req, res) => {
       agentBonusBalance: 1000,
       bonusValueToSpend: 300,
       agentBonusBalanceAfter: 700,
-      paidByBonusPoints: 300
+      paidByBonusPoints: 300,
+      receiptExtraInfo: "bebra"
     },
     needVerification: false,
   });
