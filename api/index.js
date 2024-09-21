@@ -98,11 +98,11 @@ app.post("/counterparty/detail", async (req, res) => {
 });
 
 app.post("/retaildemand/recalc", async (req, res) => {
-  const { meta } = req.body;
+  const { meta, positions, agent, bonusProgram } = req.body;
 
   try {
     const response = await axios.get(
-      `https://api.moysklad.ru/api/remap/1.2/entity/counterparty/${meta.agent.meta.id}`,
+      `https://api.moysklad.ru/api/remap/1.2/entity/counterparty/${agent.meta.id}`,
       {
         headers: {
           Authorization: `Bearer ${TOKEN}`,
@@ -113,22 +113,97 @@ app.post("/retaildemand/recalc", async (req, res) => {
 
     const counterparty = response.data;
 
-    if (counterparty.id) {
-      let bonusField = null;
-      if (counterparty.attributes && counterparty.attributes.length > 0) {
-        bonusField = counterparty.attributes.find(
-          (attr) => attr.name === "Бонусы"
-        );
-      }
-
-      res.status(200).json({
-        bonusProgram: {
-          agentBonusBalance: bonusField ? bonusField.value : 0,
-        },
-      });
-    } else {
-      res.status(404).json({ error: "Контрагент не найден" });
+    if (!counterparty.id) {
+      return res.status(404).json({ error: "Контрагент не найден" });
     }
+
+    let bonusField = null;
+    if (counterparty.attributes && counterparty.attributes.length > 0) {
+      bonusField = counterparty.attributes.find(
+        (attr) => attr.name === "Бонусы"
+      );
+    }
+
+    const bonusBalance = bonusField ? bonusField.value : 0;
+    const tags = counterparty.tags || [];
+
+    let earnPercent = 0;
+    let maxBonusSpendPercent = 0;
+
+    if (tags.includes("silver")) {
+      earnPercent = 5;
+      maxBonusSpendPercent = 30;
+    } else if (tags.includes("platinum")) {
+      earnPercent = 15;
+      maxBonusSpendPercent = 50;
+    } else if (tags.includes("gold")) {
+      earnPercent = 10;
+      maxBonusSpendPercent = 30;
+    } else if (tags.includes("партнер")) {
+      earnPercent = 20;
+      maxBonusSpendPercent = 50;
+    }
+
+    let totalSum = 0;
+    positions.forEach(position => {
+      totalSum += position.quantity * position.price;
+    });
+
+    if (bonusProgram.transactionType === "EARNING") {
+      const bonusValueToEarn = (totalSum * earnPercent) / 100;
+
+      const result = {
+        agent: {
+          meta: agent.meta,
+        },
+        positions: positions,
+        bonusProgram: {
+          transactionType: "EARNING",
+          agentBonusBalance: bonusBalance,
+          bonusValueToEarn: bonusValueToEarn.toFixed(2),
+          agentBonusBalanceAfter: (bonusBalance + bonusValueToEarn).toFixed(2),
+          paidByBonusPoints: 0,
+        },
+        needVerification: false,
+      };
+
+      return res.status(200).json(result);
+    }
+
+    const maxBonusSpend = (totalSum * maxBonusSpendPercent) / 100;
+    const bonusValueToSpend = Math.min(bonusBalance, maxBonusSpend);
+
+    const remainingSum = totalSum - bonusValueToSpend;
+
+    const bonusValueToEarn = (remainingSum * earnPercent) / 100;
+
+    const updatedPositions = positions.map(position => {
+      const discountPercent = (bonusValueToSpend / totalSum) * 100;
+      const discountedPrice = position.price - (position.price * discountPercent) / 100;
+      return {
+        ...position,
+        discountPercent: discountPercent.toFixed(2),
+        discountedPrice: discountedPrice.toFixed(2),
+      };
+    });
+
+    const result = {
+      agent: {
+        meta: agent.meta,
+      },
+      positions: updatedPositions,
+      bonusProgram: {
+        transactionType: "SPENDING",
+        agentBonusBalance: bonusBalance,
+        bonusValueToSpend: bonusValueToSpend.toFixed(2),
+        bonusValueToEarn: bonusValueToEarn.toFixed(2),
+        agentBonusBalanceAfter: (bonusBalance - bonusValueToSpend + bonusValueToEarn).toFixed(2),
+        paidByBonusPoints: bonusValueToSpend.toFixed(2),
+      },
+      needVerification: false,
+    };
+
+    res.status(200).json(result);
   } catch (error) {
     console.error("Ошибка при запросе к API МойСклад:", error);
     res.status(500).json({ error: "Ошибка при запросе к API МойСклад" });
