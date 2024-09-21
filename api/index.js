@@ -373,8 +373,8 @@ app.post("/retaildemand/recalc", async (req, res) => {
     });
 
     if (bonusProgram.transactionType === "EARNING") {
-      const bonusValueToEarn = Math((totalSum * earnPercent) / 100);
-      const maxBonusSpend = Math((totalSum * maxBonusSpendPercent) / 100);
+      const bonusValueToEarn = Math.round((totalSum * earnPercent) / 100);
+      const maxBonusSpend = Math.round((totalSum * maxBonusSpendPercent) / 100);
       const bonusValueToSpend = Math.min(bonusBalance, maxBonusSpend);
 
       const result = {
@@ -416,11 +416,11 @@ app.post("/retaildemand/recalc", async (req, res) => {
       return res.status(200).json(result);
     }
 
-    const maxBonusSpend = Math((totalSum * maxBonusSpendPercent) / 100);
+    const maxBonusSpend = Math.round((totalSum * maxBonusSpendPercent) / 100);
     const bonusValueToSpend = Math.min(bonusBalance, maxBonusSpend);
     
     const remainingSum = totalSum - bonusValueToSpend;
-    const bonusValueToEarn = Math((remainingSum * earnPercent) / 100);
+    const bonusValueToEarn = Math.round((remainingSum * earnPercent) / 100);
 
     const updatedPositions = positions.map((position) => {
       const discountPercent = (bonusValueToSpend / totalSum) * 100;
