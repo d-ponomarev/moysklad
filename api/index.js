@@ -377,11 +377,21 @@ app.post("/retaildemand/recalc", async (req, res) => {
       const maxBonusSpend = Math.round((totalSum * maxBonusSpendPercent) / 100);
       const bonusValueToSpend = Math.min(bonusBalance, maxBonusSpend);
 
+      const updatedPositions = positions.map((position) => {
+        return {
+          assortment: position.assortment,
+          quantity: position.quantity,
+          price: position.price,
+          discountPercent: 0,
+          discountedPrice: position.price
+        };
+      });
+
       const result = {
         agent: {
           meta: {
             href: agent.meta.href,
-            id: agent.meta.href
+            id: agent.meta.id
           },
           name: agent.name,
           discountCardNumber: agent.discountCardNumber,
@@ -393,13 +403,7 @@ app.post("/retaildemand/recalc", async (req, res) => {
           sex: agent.sex,
           birthDate: agent.birthDate
         },
-        positions: positions.map((position) => ({
-          assortment: position.assortment,
-          quantity: position.quantity,
-          price: position.price,
-          discountPercent: 0,
-          discountedPrice: position.price
-        })),
+        positions: updatedPositions,
         bonusProgram: {
           transactionType: "EARNING",
           agentBonusBalance: bonusBalance,
