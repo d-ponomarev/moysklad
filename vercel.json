@@ -23,9 +23,9 @@
       "methods": ["POST"]
     },
     {
-      "src": "/test",
+      "src": "/retaildemand",
       "dest": "/api/index.js",
-      "methods": ["GET"]
+      "methods": ["POST"]
     },
     {
       "src": "/counterparty",
