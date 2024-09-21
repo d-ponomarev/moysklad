@@ -344,6 +344,8 @@ app.post("/retaildemand/recalc", (req, res) => {
           meta: {
             href: "https://api.moysklad.ru/api/remap/1.2/entity/product/62e5295c-763f-11ef-0a80-0f2100036ec8",
             id: "62e5295c-763f-11ef-0a80-0f2100036ec8",
+            type: "product",
+            idType: "native"
           },
         },
         quantity: 1,
