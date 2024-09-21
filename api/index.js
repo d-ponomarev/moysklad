@@ -433,8 +433,8 @@ app.post("/retaildemand/recalc", async (req, res) => {
         assortment: position.assortment,
         quantity: position.quantity,
         price: position.price,
-        discountPercent: 50,
-        discountedPrice: 500
+        discountPercent: discountPercent.toFixed(2),
+        discountedPrice: discountedPrice.toFixed(2)
       };
     });
 
@@ -442,7 +442,7 @@ app.post("/retaildemand/recalc", async (req, res) => {
       agent: {
         meta: {
           href: agent.meta.href,
-          id: agent.meta.href
+          id: agent.meta.id
         },
         name: agent.name,
         discountCardNumber: agent.discountCardNumber,
