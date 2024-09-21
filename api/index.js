@@ -353,10 +353,10 @@ app.post("/retaildemand/recalc", (req, res) => {
       },
     ],
     bonusProgram: {
-      transactionType: "EARNING",
+      transactionType: "SPENDING",
       agentBonusBalance: 1000,
-      bonusValueToEarn: 300,
-      agentBonusBalanceAfter: 1300,
+      bonusValueToSpend: 300,
+      agentBonusBalanceAfter: 700,
       paidByBonusPoints: 300
     },
     needVerification: false,
