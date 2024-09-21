@@ -98,7 +98,7 @@ app.post("/counterparty/detail", async (req, res) => {
 });
 
 app.post("/retaildemand/recalc", async (req, res) => {
-  const { meta, positions, agent, bonusProgram } = req.body;
+  const { positions, agent, bonusProgram } = req.body;
 
   try {
     const response = await axios.get(
@@ -119,9 +119,7 @@ app.post("/retaildemand/recalc", async (req, res) => {
 
     let bonusField = null;
     if (counterparty.attributes && counterparty.attributes.length > 0) {
-      bonusField = counterparty.attributes.find(
-        (attr) => attr.name === "Бонусы"
-      );
+      bonusField = counterparty.attributes.find((attr) => attr.name === "Бонусы");
     }
 
     const bonusBalance = bonusField ? bonusField.value : 0;
@@ -155,14 +153,31 @@ app.post("/retaildemand/recalc", async (req, res) => {
       const result = {
         agent: {
           meta: agent.meta,
+          name: counterparty.name || '',
+          discountCardNumber: counterparty.discountCardNumber || '',
+          phone: counterparty.phone || '',
+          email: counterparty.email || '',
+          legalFirstName: counterparty.legalFirstName || '',
+          legalMiddleName: counterparty.legalMiddleName || '',
+          legalLastName: counterparty.legalLastName || '',
+          sex: counterparty.sex || '',
+          birthDate: counterparty.birthDate || '',
         },
-        positions: positions,
+        positions: positions.map((position) => ({
+          assortment: position.assortment,
+          quantity: position.quantity,
+          price: position.price,
+          discountPercent: 0, // Начисление не дает скидку
+          discountedPrice: position.price.toFixed(2), // Без изменения
+          sn: position.sn || [],
+        })),
         bonusProgram: {
           transactionType: "EARNING",
           agentBonusBalance: bonusBalance,
           bonusValueToEarn: bonusValueToEarn.toFixed(2),
           agentBonusBalanceAfter: (bonusBalance + bonusValueToEarn).toFixed(2),
           paidByBonusPoints: 0,
+          receiptExtraInfo: "Спасибо за участие в нашей программе!",
         },
         needVerification: false,
       };
@@ -178,19 +193,31 @@ app.post("/retaildemand/recalc", async (req, res) => {
 
     const bonusValueToEarn = (remainingSum * earnPercent) / 100;
 
-    const updatedPositions = positions.map(position => {
+    const updatedPositions = positions.map((position) => {
       const discountPercent = (bonusValueToSpend / totalSum) * 100;
       const discountedPrice = position.price - (position.price * discountPercent) / 100;
       return {
-        ...position,
+        assortment: position.assortment,
+        quantity: position.quantity,
+        price: position.price.toFixed(2),
         discountPercent: discountPercent.toFixed(2),
         discountedPrice: discountedPrice.toFixed(2),
+        sn: position.sn || [],
       };
     });
 
     const result = {
       agent: {
         meta: agent.meta,
+        name: counterparty.name || '',
+        discountCardNumber: counterparty.discountCardNumber || '',
+        phone: counterparty.phone || '',
+        email: counterparty.email || '',
+        legalFirstName: counterparty.legalFirstName || '',
+        legalMiddleName: counterparty.legalMiddleName || '',
+        legalLastName: counterparty.legalLastName || '',
+        sex: counterparty.sex || '',
+        birthDate: counterparty.birthDate || '',
       },
       positions: updatedPositions,
       bonusProgram: {
@@ -200,6 +227,7 @@ app.post("/retaildemand/recalc", async (req, res) => {
         bonusValueToEarn: bonusValueToEarn.toFixed(2),
         agentBonusBalanceAfter: (bonusBalance - bonusValueToSpend + bonusValueToEarn).toFixed(2),
         paidByBonusPoints: bonusValueToSpend.toFixed(2),
+        receiptExtraInfo: "Спасибо за участие в нашей программе!",
       },
       needVerification: false,
     };
