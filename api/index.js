@@ -378,12 +378,14 @@ app.post("/retaildemand/recalc", async (req, res) => {
       const bonusValueToSpend = Math.min(bonusBalance, maxBonusSpend);
 
       const updatedPositions = positions.map((position) => {
+        const discountPercent = (bonusValueToSpend / totalSum) * 100;
+        const discountedPrice = position.price - (position.price * discountPercent) / 100;
         return {
           assortment: position.assortment,
           quantity: position.quantity,
-          price: position.price,
-          discountPercent: 0,
-          discountedPrice: position.price
+          price: position.price.toFixed(2),
+          discountPercent: discountPercent.toFixed(2),
+          discountedPrice: discountedPrice.toFixed(2)
         };
       });
 
