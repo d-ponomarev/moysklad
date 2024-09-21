@@ -167,6 +167,7 @@ app.post("/retaildemand/recalc", async (req, res) => {
         needVerification: false,
       };
 
+      console.log(result);
       return res.status(200).json(result);
     }
 
@@ -203,6 +204,7 @@ app.post("/retaildemand/recalc", async (req, res) => {
       needVerification: false,
     };
 
+    console.log(result);
     res.status(200).json(result);
   } catch (error) {
     console.error("Ошибка при запросе к API МойСклад:", error);
