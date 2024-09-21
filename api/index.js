@@ -347,9 +347,9 @@ app.post("/retaildemand/recalc", (req, res) => {
           },
         },
         quantity: 1,
-        price: 700,
+        price: 1000,
         discountPercent: 0,
-        discountedPrice: 0,
+        discountedPrice: 1000,
       },
     ],
     bonusProgram: {
