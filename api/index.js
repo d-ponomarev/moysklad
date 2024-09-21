@@ -347,9 +347,9 @@ app.post("/retaildemand/recalc", (req, res) => {
           },
         },
         quantity: 1,
-        price: 700,
+        price: 1000,
         discountPercent: 30,
-        discountedPrice: 300,
+        discountedPrice: 700,
       },
     ],
     bonusProgram: {
@@ -357,8 +357,7 @@ app.post("/retaildemand/recalc", (req, res) => {
       agentBonusBalance: 1000,
       bonusValueToEarn: 300,
       agentBonusBalanceAfter: 1300,
-      paidByBonusPoints: 0,
-      receiptExtraInfo: "Спасибо за участие в нашей программе!",
+      paidByBonusPoints: 300
     },
     needVerification: false,
   });
