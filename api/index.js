@@ -168,8 +168,7 @@ app.post("/retaildemand/recalc", async (req, res) => {
           quantity: position.quantity,
           price: position.price,
           discountPercent: 0,
-          discountedPrice: position.price.toFixed(2),
-          sn: position.sn,
+          discountedPrice: position.price.toFixed(2)
         })),
         bonusProgram: {
           transactionType: "EARNING",
@@ -222,10 +221,10 @@ app.post("/retaildemand/recalc", async (req, res) => {
       bonusProgram: {
         transactionType: "SPENDING",
         agentBonusBalance: bonusBalance,
-        bonusValueToSpend: bonusValueToSpend.toFixed(2),
-        bonusValueToEarn: bonusValueToEarn.toFixed(2),
-        agentBonusBalanceAfter: (bonusBalance - bonusValueToSpend + bonusValueToEarn).toFixed(2),
-        paidByBonusPoints: bonusValueToSpend.toFixed(2),
+        bonusValueToSpend: bonusValueToSpend,
+        bonusValueToEarn: bonusValueToEarn,
+        agentBonusBalanceAfter: (bonusBalance - bonusValueToSpend + bonusValueToEarn),
+        paidByBonusPoints: bonusValueToSpend,
       },
       needVerification: false,
     };
