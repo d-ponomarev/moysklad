@@ -349,15 +349,15 @@ app.post("/retaildemand/recalc", (req, res) => {
         quantity: 1,
         price: 1000,
         discountPercent: 30,
-        discountedPrice: 700,
+        discountedPrice: 1000,
       },
     ],
     bonusProgram: {
       transactionType: "SPENDING",
       agentBonusBalance: 1000,
       bonusValueToSpend: 300,
-      agentBonusBalanceAfter: 800,
-      paidByBonusPoints: 0
+      agentBonusBalanceAfter: 700,
+      paidByBonusPoints: 300
     },
     needVerification: false,
   });
