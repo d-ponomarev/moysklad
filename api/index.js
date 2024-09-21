@@ -196,11 +196,18 @@ app.post("/retaildemand/create", async (req, res) => {
     }
 
     if (groupChanged) {
+      const updateUrl = counterpartyUrl;
+
+      const payload = {
+        tags: updatedTags.map((tag) => ({ name: tag })),
+      };
+
+      console.log("Отправляем PUT-запрос на URL:", updateUrl);
+      console.log("Отправляемые данные:", JSON.stringify(payload, null, 2));
+
       const counterpartyEditResponse = await axios.put(
-        counterpartyUrl,
-        {
-          tags: updatedTags.map((tag) => ({ name: tag })),
-        },
+        updateUrl,
+        payload,
         {
           headers: {
             Authorization: `Bearer ${TOKEN}`,
@@ -209,10 +216,17 @@ app.post("/retaildemand/create", async (req, res) => {
           },
         }
       );
-      console.log(`Теги обновлены: ${updatedTags}`);
-    }
 
-    res.status(200).json({ message: "Теги обновлены", updatedTags });
+      console.log("Ответ от PUT-запроса:", JSON.stringify(counterpartyEditResponse.data, null, 2));
+      
+      res.status(200).json({
+        message: "Теги обновлены",
+        updatedTags,
+        counterpartyEditResponse: counterpartyEditResponse.data
+      });
+    } else {
+      res.status(200).json({ message: "Группы не изменены", updatedTags });
+    }
   } catch (error) {
     console.error("Ошибка при запросе к API МойСклад:", error);
     res.status(500).json({ error: "Ошибка при запросе к API МойСклад" });
