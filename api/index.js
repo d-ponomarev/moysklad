@@ -435,8 +435,8 @@ app.post("/retaildemand/recalc", async (req, res) => {
         assortment: position.assortment,
         quantity: position.quantity,
         price: position.price.toFixed(2),
-        discountPercent: discountPercent.toFixed(2),
-        discountedPrice: discountedPrice.toFixed(2)
+        discountPercent: 50,
+        discountedPrice: 500
       };
     });
 
