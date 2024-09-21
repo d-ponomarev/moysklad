@@ -323,193 +323,193 @@ app.post("/retaildemand/create", async (req, res) => {
 app.post("/retaildemand/recalc", async (req, res) => {
   console.log(JSON.stringify(req.body, null, 2));
 
-  // const { positions, agent, bonusProgram, preferredBonusToSpend } = req.body;
+  const { positions, agent, bonusProgram, preferredBonusToSpend } = req.body;
 
-  // try {
-  //   const response = await axios.get(
-  //     `https://api.moysklad.ru/api/remap/1.2/entity/counterparty/${agent.meta.id}`,
-  //     {
-  //       headers: {
-  //         Authorization: `Bearer ${TOKEN}`,
-  //         "Content-Type": "application/json",
-  //       },
-  //     }
-  //   );
-
-  //   const counterparty = response.data;
-
-  //   if (!counterparty.id) {
-  //     return res.status(404).json({ error: "Контрагент не найден" });
-  //   }
-
-  //   let bonusField = null;
-  //   if (counterparty.attributes && counterparty.attributes.length > 0) {
-  //     bonusField = counterparty.attributes.find((attr) => attr.name === "Бонусы");
-  //   }
-
-  //   const bonusBalance = bonusField ? bonusField.value : 0;
-  //   const tags = counterparty.tags || [];
-
-  //   let earnPercent = 0;
-  //   let maxBonusSpendPercent = 0;
-
-  //   if (tags.includes("silver")) {
-  //     earnPercent = 5;
-  //     maxBonusSpendPercent = 30;
-  //   } else if (tags.includes("platinum")) {
-  //     earnPercent = 15;
-  //     maxBonusSpendPercent = 50;
-  //   } else if (tags.includes("gold")) {
-  //     earnPercent = 10;
-  //     maxBonusSpendPercent = 30;
-  //   } else if (tags.includes("партнер")) {
-  //     earnPercent = 20;
-  //     maxBonusSpendPercent = 50;
-  //   }
-
-  //   let totalSum = 0;
-  //   positions.forEach(position => {
-  //     totalSum += position.quantity * position.price;
-  //   });
-
-  //   if (bonusProgram.transactionType === "EARNING") {
-  //     const bonusValueToEarn = Math((totalSum * earnPercent) / 100);
-  //     const maxBonusSpend = Math((totalSum * maxBonusSpendPercent) / 100);
-  //     const bonusValueToSpend = Math.min(bonusBalance, maxBonusSpend);
-
-  //     const result = {
-  //       agent: {
-  //         meta: {
-  //           href: agent.meta.href,
-  //           id: agent.meta.href
-  //         },
-  //         name: agent.name,
-  //         discountCardNumber: agent.discountCardNumber,
-  //         phone: agent.phone,
-  //         email: agent.email,
-  //         legalFirstName: agent.legalFirstName,
-  //         legalMiddleName: agent.legalMiddleName,
-  //         legalLastName: agent.legalLastName,
-  //         sex: agent.sex,
-  //         birthDate: agent.birthDate
-  //       },
-  //       positions: positions.map((position) => ({
-  //         assortment: position.assortment,
-  //         quantity: position.quantity,
-  //         price: position.price,
-  //         discountPercent: 0,
-  //         discountedPrice: position.price
-  //       })),
-  //       bonusProgram: {
-  //         transactionType: "EARNING",
-  //         agentBonusBalance: bonusBalance,
-  //         bonusValueToSpend: bonusValueToSpend,
-  //         bonusValueToEarn: bonusValueToEarn,
-  //         agentBonusBalanceAfter: Math.round(bonusBalance + bonusValueToEarn),
-  //         paidByBonusPoints: 0,
-  //         receiptExtraInfo: "Спасибо за участие в нашей программе!"
-  //       },
-  //       needVerification: false
-  //     };
-
-  //     console.log(JSON.stringify(result, null, 2));
-  //     return res.status(200).json(result);
-  //   }
-
-  //   const maxBonusSpend = Math((totalSum * maxBonusSpendPercent) / 100);
-  //   const bonusValueToSpend = Math.min(bonusBalance, maxBonusSpend);
-    
-  //   const remainingSum = totalSum - bonusValueToSpend;
-  //   const bonusValueToEarn = Math((remainingSum * earnPercent) / 100);
-
-  //   const updatedPositions = positions.map((position) => {
-  //     const discountPercent = (bonusValueToSpend / totalSum) * 100;
-  //     const discountedPrice = position.price - (position.price * discountPercent) / 100;
-  //     return {
-  //       assortment: position.assortment,
-  //       quantity: position.quantity,
-  //       price: position.price.toFixed(2),
-  //       discountPercent: discountPercent.toFixed(2),
-  //       discountedPrice: discountedPrice.toFixed(2)
-  //     };
-  //   });
-
-  //   const result = {
-  //     agent: {
-  //       meta: {
-  //         href: agent.meta.href,
-  //         id: agent.meta.href
-  //       },
-  //       name: agent.name,
-  //       discountCardNumber: agent.discountCardNumber,
-  //       phone: agent.phone,
-  //       email: agent.email,
-  //       legalFirstName: agent.legalFirstName,
-  //       legalMiddleName: agent.legalMiddleName,
-  //       legalLastName: agent.legalLastName,
-  //       sex: agent.sex,
-  //       birthDate: agent.birthDate
-  //     },
-  //     positions: updatedPositions,
-  //     bonusProgram: {
-  //       transactionType: "SPENDING",
-  //       agentBonusBalance: bonusBalance,
-  //       bonusValueToSpend: bonusValueToSpend,
-  //       bonusValueToEarn: bonusValueToEarn,
-  //       agentBonusBalanceAfter: (bonusBalance - bonusValueToSpend + bonusValueToEarn),
-  //       paidByBonusPoints: bonusValueToSpend,
-  //       receiptExtraInfo: "Спасибо за участие в нашей программе!"
-  //     },
-  //     needVerification: false
-  //   };
-
-  //   console.log(JSON.stringify(result, null, 2));
-  //   res.status(200).json(result);
-
-  // } catch (error) {
-  //   console.error("Ошибка при запросе к API МойСклад:", error);
-  //   res.status(500).json({ error: "Ошибка при запросе к API МойСклад" });
-  // }
-  res.status(200).json({
-    agent: {
-      meta: {
-        href: "https://api.moysklad.ru/api/remap/1.2/entity/retailstore/f537a960-7592-11ef-0a80-17780023cdc4",
-        id: "f537a960-7592-11ef-0a80-17780023cdc4",
-      },
-      name: "рарап",
-      discountCardNumber: "111708950759",
-      phone: "89999999999",
-      email: "",
-      legalFirstName: null,
-      legalMiddleName: null,
-      legalLastName: null,
-      sex: null,
-      birthDate: null,
-    },
-    positions: [
+  try {
+    const response = await axios.get(
+      `https://api.moysklad.ru/api/remap/1.2/entity/counterparty/${agent.meta.id}`,
       {
-        assortment: {
-          meta: {
-            href: "https://api.moysklad.ru/api/remap/1.2/entity/product/62e5295c-763f-11ef-0a80-0f2100036ec8",
-            id: "62e5295c-763f-11ef-0a80-0f2100036ec8",
-          },
+        headers: {
+          Authorization: `Bearer ${TOKEN}`,
+          "Content-Type": "application/json",
         },
-        quantity: 1,
-        price: 1000,
-        discountPercent: 30,
-        discountedPrice: 700,
+      }
+    );
+
+    const counterparty = response.data;
+
+    if (!counterparty.id) {
+      return res.status(404).json({ error: "Контрагент не найден" });
+    }
+
+    let bonusField = null;
+    if (counterparty.attributes && counterparty.attributes.length > 0) {
+      bonusField = counterparty.attributes.find((attr) => attr.name === "Бонусы");
+    }
+
+    const bonusBalance = bonusField ? bonusField.value : 0;
+    const tags = counterparty.tags || [];
+
+    let earnPercent = 0;
+    let maxBonusSpendPercent = 0;
+
+    if (tags.includes("silver")) {
+      earnPercent = 5;
+      maxBonusSpendPercent = 30;
+    } else if (tags.includes("platinum")) {
+      earnPercent = 15;
+      maxBonusSpendPercent = 50;
+    } else if (tags.includes("gold")) {
+      earnPercent = 10;
+      maxBonusSpendPercent = 30;
+    } else if (tags.includes("партнер")) {
+      earnPercent = 20;
+      maxBonusSpendPercent = 50;
+    }
+
+    let totalSum = 0;
+    positions.forEach(position => {
+      totalSum += position.quantity * position.price;
+    });
+
+    if (bonusProgram.transactionType === "EARNING") {
+      const bonusValueToEarn = Math((totalSum * earnPercent) / 100);
+      const maxBonusSpend = Math((totalSum * maxBonusSpendPercent) / 100);
+      const bonusValueToSpend = Math.min(bonusBalance, maxBonusSpend);
+
+      const result = {
+        agent: {
+          meta: {
+            href: agent.meta.href,
+            id: agent.meta.href
+          },
+          name: agent.name,
+          discountCardNumber: agent.discountCardNumber,
+          phone: agent.phone,
+          email: agent.email,
+          legalFirstName: agent.legalFirstName,
+          legalMiddleName: agent.legalMiddleName,
+          legalLastName: agent.legalLastName,
+          sex: agent.sex,
+          birthDate: agent.birthDate
+        },
+        positions: positions.map((position) => ({
+          assortment: position.assortment,
+          quantity: position.quantity,
+          price: position.price,
+          discountPercent: 0,
+          discountedPrice: position.price
+        })),
+        bonusProgram: {
+          transactionType: "EARNING",
+          agentBonusBalance: bonusBalance,
+          bonusValueToSpend: bonusValueToSpend,
+          bonusValueToEarn: bonusValueToEarn,
+          agentBonusBalanceAfter: Math.round(bonusBalance + bonusValueToEarn),
+          paidByBonusPoints: 0,
+          receiptExtraInfo: "Спасибо за участие в нашей программе!"
+        },
+        needVerification: false
+      };
+
+      console.log(JSON.stringify(result, null, 2));
+      return res.status(200).json(result);
+    }
+
+    const maxBonusSpend = Math((totalSum * maxBonusSpendPercent) / 100);
+    const bonusValueToSpend = Math.min(bonusBalance, maxBonusSpend);
+    
+    const remainingSum = totalSum - bonusValueToSpend;
+    const bonusValueToEarn = Math((remainingSum * earnPercent) / 100);
+
+    const updatedPositions = positions.map((position) => {
+      const discountPercent = (bonusValueToSpend / totalSum) * 100;
+      const discountedPrice = position.price - (position.price * discountPercent) / 100;
+      return {
+        assortment: position.assortment,
+        quantity: position.quantity,
+        price: position.price.toFixed(2),
+        discountPercent: discountPercent.toFixed(2),
+        discountedPrice: discountedPrice.toFixed(2)
+      };
+    });
+
+    const result = {
+      agent: {
+        meta: {
+          href: agent.meta.href,
+          id: agent.meta.href
+        },
+        name: agent.name,
+        discountCardNumber: agent.discountCardNumber,
+        phone: agent.phone,
+        email: agent.email,
+        legalFirstName: agent.legalFirstName,
+        legalMiddleName: agent.legalMiddleName,
+        legalLastName: agent.legalLastName,
+        sex: agent.sex,
+        birthDate: agent.birthDate
       },
-    ],
-    bonusProgram: {
-      transactionType: "SPENDING",
-      agentBonusBalance: 1000,
-      bonusValueToSpend: 300,
-      agentBonusBalanceAfter: 700,
-      paidByBonusPoints: 300,
-      receiptExtraInfo: "bebra"
-    },
-    needVerification: false,
-  });
+      positions: updatedPositions,
+      bonusProgram: {
+        transactionType: "SPENDING",
+        agentBonusBalance: bonusBalance,
+        bonusValueToSpend: bonusValueToSpend,
+        bonusValueToEarn: bonusValueToEarn,
+        agentBonusBalanceAfter: (bonusBalance - bonusValueToSpend + bonusValueToEarn),
+        paidByBonusPoints: bonusValueToSpend,
+        receiptExtraInfo: "Спасибо за участие в нашей программе!"
+      },
+      needVerification: false
+    };
+
+    console.log(JSON.stringify(result, null, 2));
+    res.status(200).json(result);
+
+  } catch (error) {
+    console.error("Ошибка при запросе к API МойСклад:", error);
+    res.status(500).json({ error: "Ошибка при запросе к API МойСклад" });
+  }
+  // res.status(200).json({
+  //   agent: {
+  //     meta: {
+  //       href: "https://api.moysklad.ru/api/remap/1.2/entity/retailstore/f537a960-7592-11ef-0a80-17780023cdc4",
+  //       id: "f537a960-7592-11ef-0a80-17780023cdc4",
+  //     },
+  //     name: "рарап",
+  //     discountCardNumber: "111708950759",
+  //     phone: "89999999999",
+  //     email: "",
+  //     legalFirstName: null,
+  //     legalMiddleName: null,
+  //     legalLastName: null,
+  //     sex: null,
+  //     birthDate: null,
+  //   },
+  //   positions: [
+  //     {
+  //       assortment: {
+  //         meta: {
+  //           href: "https://api.moysklad.ru/api/remap/1.2/entity/product/62e5295c-763f-11ef-0a80-0f2100036ec8",
+  //           id: "62e5295c-763f-11ef-0a80-0f2100036ec8",
+  //         },
+  //       },
+  //       quantity: 1,
+  //       price: 1000,
+  //       discountPercent: 30,
+  //       discountedPrice: 700,
+  //     },
+  //   ],
+  //   bonusProgram: {
+  //     transactionType: "SPENDING",
+  //     agentBonusBalance: 1000,
+  //     bonusValueToSpend: 300,
+  //     agentBonusBalanceAfter: 700,
+  //     paidByBonusPoints: 300,
+  //     receiptExtraInfo: "bebra"
+  //   },
+  //   needVerification: false,
+  // });
 });
 
 const port = process.env.PORT || 3000;
