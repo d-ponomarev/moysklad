@@ -209,7 +209,7 @@ app.post("/retaildemand/create", async (req, res) => {
           },
         }
       );
-      console.log(`Теги обновлены: ${counterpartyEditResponse}`);
+      console.log(`Теги обновлены: ${JSON.stringify(counterpartyEditResponse)}`);
     }
 
     res.status(200).json({ message: "Теги обновлены", updatedTags });
