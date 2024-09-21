@@ -239,7 +239,12 @@ app.post("/counterparty/detail", async (req, res) => {
 app.post("/retaildemand/create", async (req, res) => {
   const { body } = req;
 
-  if (!body.events || !body.events[0] || !body.events[0].meta || !body.events[0].meta.href) {
+  if (
+    !body.events ||
+    !body.events[0] ||
+    !body.events[0].meta ||
+    !body.events[0].meta.href
+  ) {
     return;
   }
 
@@ -249,8 +254,8 @@ app.post("/retaildemand/create", async (req, res) => {
       headers: {
         Authorization: `Bearer ${TOKEN}`,
         "Accept-Encoding": "gzip",
-        "Content-Type": "application/json"
-      }
+        "Content-Type": "application/json",
+      },
     });
 
     const orderData = orderResponse.data;
@@ -260,8 +265,8 @@ app.post("/retaildemand/create", async (req, res) => {
       headers: {
         Authorization: `Bearer ${TOKEN}`,
         "Accept-Encoding": "gzip",
-        "Content-Type": "application/json"
-      }
+        "Content-Type": "application/json",
+      },
     });
 
     const counterpartyData = counterpartyResponse.data;
@@ -269,42 +274,46 @@ app.post("/retaildemand/create", async (req, res) => {
 
     const salesAmount = counterpartyData.salesAmount;
 
-    let updatedTags = [...tags.map(tag => tag)];
+    let updatedTags = [...tags.map((tag) => tag)];
     let groupChanged = false;
 
-    if (salesAmount >= 100 && salesAmount < 1000000 && !updatedTags.includes("silver")) {
+    if (
+      salesAmount >= 100 &&
+      salesAmount < 1000000 &&
+      !updatedTags.includes("silver")
+    ) {
       updatedTags.push("silver");
       groupChanged = true;
     } else if (salesAmount >= 1000000 && salesAmount < 3000000) {
       if (!updatedTags.includes("gold")) {
         updatedTags.push("gold");
-        updatedTags = updatedTags.filter(tag => tag !== "silver");
+        updatedTags = updatedTags.filter((tag) => tag !== "silver");
         groupChanged = true;
       }
     } else if (salesAmount >= 3000000 && !updatedTags.includes("platinum")) {
       updatedTags.push("platinum");
-      updatedTags = updatedTags.filter(tag => tag !== "gold");
+      updatedTags = updatedTags.filter((tag) => tag !== "gold");
       groupChanged = true;
     }
 
     if (groupChanged) {
-      const counterpartyEditResponse = await axios.put(counterpartyUrl,
+      const counterpartyEditResponse = await axios.put(
+        counterpartyUrl,
         {
-          tags: updatedTags
+          tags: updatedTags,
         },
         {
           headers: {
             Authorization: `Bearer ${TOKEN}`,
             "Accept-Encoding": "gzip",
-            "Content-Type": "application/json"
-          }
+            "Content-Type": "application/json",
+          },
         }
       );
       console.log(`Теги обновлены: ${updatedTags}`);
     }
 
     res.status(200).json({ message: "Теги обновлены", updatedTags });
-
   } catch (error) {
     console.error("Ошибка при запросе к API МойСклад:", error);
     res.status(500).json({ error: "Ошибка при запросе к API МойСклад" });
@@ -313,7 +322,47 @@ app.post("/retaildemand/create", async (req, res) => {
 
 app.post("/retaildemand/recalc", (req, res) => {
   console.log(JSON.stringify(req.body, null, 2));
-  res.status(200).json(req.body);
+  res.status(200).json({
+    agent: {
+      meta: {
+        href: "https://api.moysklad.ru/api/remap/1.2/entity/retailstore/f537a960-7592-11ef-0a80-17780023cdc4",
+        id: "f537a960-7592-11ef-0a80-17780023cdc4",
+      },
+      name: "рарап",
+      discountCardNumber: "111708950759",
+      phone: "89999999999",
+      email: "",
+      legalFirstName: null,
+      legalMiddleName: null,
+      legalLastName: null,
+      sex: null,
+      birthDate: null,
+    },
+    positions: [
+      {
+        assortment: {
+          meta: {
+            href: "https://api.moysklad.ru/api/remap/1.2/entity/product/62e5295c-763f-11ef-0a80-0f2100036ec8",
+            id: "62e5295c-763f-11ef-0a80-0f2100036ec8",
+          },
+        },
+        quantity: 1,
+        price: 700,
+        discountPercent: 30,
+        discountedPrice: 300,
+      },
+    ],
+    bonusProgram: {
+      transactionType: "EARNING",
+      agentBonusBalance: 1000,
+      bonusValueToSpend: 0,
+      bonusValueToEarn: 300,
+      agentBonusBalanceAfter: 1300,
+      paidByBonusPoints: 0,
+      receiptExtraInfo: "Спасибо за участие в нашей программе!",
+    },
+    needVerification: false,
+  });
 });
 
 const port = process.env.PORT || 3000;
