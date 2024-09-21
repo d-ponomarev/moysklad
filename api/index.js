@@ -168,7 +168,7 @@ app.post("/retaildemand/create", async (req, res) => {
 
     const salesAmount = counterpartyData.salesAmount;
 
-    let updatedTags = [...tags.map(tag => tag.name)];
+    let updatedTags = [...tags.map(tag => tag)];
     let groupChanged = false;
 
     if (salesAmount >= 100 && salesAmount < 1000000 && !updatedTags.includes("silver")) {
