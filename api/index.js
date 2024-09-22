@@ -61,6 +61,7 @@ app.get("/counterparty", async (req, res) => {
 
 app.post("/counterparty/detail", async (req, res) => {
   const { meta } = req.body;
+  console.log(req.body);
 
   try {
     const response = await axios.get(
