@@ -280,14 +280,16 @@ app.post("/retaildemand", async (req, res) => {
 
     const levels = ["silver", "gold", "platinum"];
     updatedTags = updatedTags.filter(tag => !levels.includes(tag));
+    
+    let sales = (salesAmount / 100) + retaildemand.cashSum + retaildemand.noCashSum;
 
-    if (salesAmount >= 0 && salesAmount <= 9999) {
+    if (sales >= 0 && sales <= 9999) {
       updatedTags.push("silver");
       groupChanged = true;
-    } else if (salesAmount >= 10000 && salesAmount <= 29999) {
+    } else if (sales >= 10000 && sales <= 29999) {
       updatedTags.push("gold");
       groupChanged = true;
-    } else if (salesAmount >= 30000) {
+    } else if (sales >= 30000) {
       updatedTags.push("platinum");
       groupChanged = true;
     }
