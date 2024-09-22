@@ -390,7 +390,7 @@ app.post("/retaildemand", async (req, res) => {
           },
         }
       );
-      console.log(response);
+      console.log(response.data);
     }
 
     console.log(updatedTags);
