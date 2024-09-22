@@ -246,16 +246,60 @@ app.post("/retaildemand/recalc", async (req, res) => {
   }
 });
 
-app.post("/retaildemand", (req, res) => {
+app.post("/retaildemand", async (req, res) => {
   console.log(JSON.stringify(req.body, null, 2));
   const retaildemand = req.body;
 
-  res.status(201).send();
+  try {
+    const response = await axios.get(
+      `https://api.moysklad.ru/api/remap/1.2/entity/counterparty/${retaildemand.agent.meta.id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${TOKEN}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-  (async () => {
-    try {
-      const response = await axios.get(
+    const counterparty = response.data;
+
+    let tags = counterparty.tags;
+    const salesAmount = counterparty.salesAmount / 100;
+    
+    let updatedTags = [...tags];
+
+    let bonusField = null;
+    if (counterparty.attributes && counterparty.attributes.length > 0) {
+      bonusField = counterparty.attributes.find((attr) => attr.name === "Бонусы");
+      if (bonusField) {
+        bonusField.value = bonusField.value - retaildemand.bonusProgram.bonusValueToSpend + retaildemand.bonusProgram.bonusValueToEarn;
+      }
+    }
+
+    let groupChanged = false;
+
+    const levels = ["silver", "gold", "platinum"];
+    updatedTags = updatedTags.filter(tag => !levels.includes(tag));
+    let sales = salesAmount + retaildemand.cashSum + retaildemand.noCashSum;
+
+    if (sales >= 0 && sales <= 9999) {
+      updatedTags.push("silver");
+      groupChanged = true;
+    } else if (sales >= 10000 && sales <= 29999) {
+      updatedTags.push("gold");
+      groupChanged = true;
+    } else if (sales >= 30000) {
+      updatedTags.push("platinum");
+      groupChanged = true;
+    }
+
+    if (groupChanged || bonusField) {
+      const updatedData = { tags: updatedTags };
+      if (bonusField) updatedData.attributes = [bonusField];
+
+      const updateResponse = await axios.put(
         `https://api.moysklad.ru/api/remap/1.2/entity/counterparty/${retaildemand.agent.meta.id}`,
+        updatedData,
         {
           headers: {
             Authorization: `Bearer ${TOKEN}`,
@@ -263,59 +307,14 @@ app.post("/retaildemand", (req, res) => {
           },
         }
       );
-  
-      const counterparty = response.data;
-  
-      let tags = counterparty.tags;
-      const salesAmount = counterparty.salesAmount / 100;
-      
-      let updatedTags = [...tags];
-  
-      let bonusField = null;
-      if (counterparty.attributes && counterparty.attributes.length > 0) {
-        bonusField = counterparty.attributes.find((attr) => attr.name === "Бонусы");
-        if (bonusField) {
-          bonusField.value = bonusField.value - retaildemand.bonusProgram.bonusValueToSpend + retaildemand.bonusProgram.bonusValueToEarn;
-        }
-      }
-  
-      let groupChanged = false;
-  
-      const levels = ["silver", "gold", "platinum"];
-      updatedTags = updatedTags.filter(tag => !levels.includes(tag));
-  
-      if (salesAmount >= 0 && salesAmount <= 9999) {
-        updatedTags.push("silver");
-        groupChanged = true;
-      } else if (salesAmount >= 10000 && salesAmount <= 29999) {
-        updatedTags.push("gold");
-        groupChanged = true;
-      } else if (salesAmount >= 30000) {
-        updatedTags.push("platinum");
-        groupChanged = true;
-      }
-  
-      if (groupChanged || bonusField) {
-        const updatedData = { tags: updatedTags };
-        if (bonusField) updatedData.attributes = [bonusField];
-  
-        const updateResponse = await axios.put(
-          `https://api.moysklad.ru/api/remap/1.2/entity/counterparty/${retaildemand.agent.meta.id}`,
-          updatedData,
-          {
-            headers: {
-              Authorization: `Bearer ${TOKEN}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        console.log(updateResponse.data);
-      }
-    } catch (error) {
-      console.error("Ошибка при запросе к API МойСклад:", error);
-      res.status(500).json({ error: "Ошибка при запросе к API МойСклад" });
+      console.log(updateResponse.data);
     }
-  })();
+
+    res.status(201).send();
+  } catch (error) {
+    console.error("Ошибка при запросе к API МойСклад:", error);
+    res.status(500).json({ error: "Ошибка при запросе к API МойСклад" });
+  }
 });
 
 const port = process.env.PORT || 3000;
