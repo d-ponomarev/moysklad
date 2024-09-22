@@ -128,17 +128,17 @@ app.post("/retaildemand/recalc", async (req, res) => {
     let earnPercent = 0;
     let maxBonusSpendPercent = 0;
 
-    if (tags.includes("silver")) {
+    if (tags.includes("партнер ")) {
+      earnPercent = 20;
+      maxBonusSpendPercent = 50 ;
+    } else if (tags.includes("silver")) {
       earnPercent = 5;
       maxBonusSpendPercent = 30;
-    } else if (tags.includes("platinum")) {
-      earnPercent = 15;
-      maxBonusSpendPercent = 50;
     } else if (tags.includes("gold")) {
       earnPercent = 10;
       maxBonusSpendPercent = 30;
-    } else if (tags.includes("партнер")) {
-      earnPercent = 20;
+    } else if (tags.includes("platinum")) {
+      earnPercent = 15;
       maxBonusSpendPercent = 50;
     }
 
