@@ -250,6 +250,8 @@ app.post("/retaildemand", async (req, res) => {
   console.log(JSON.stringify(req.body, null, 2));
   const retaildemand = req.body;
 
+  res.status(201).send();
+
   try {
     const response = await axios.get(
       `https://api.moysklad.ru/api/remap/1.2/entity/counterparty/${retaildemand.agent.meta.id}`,
@@ -280,16 +282,14 @@ app.post("/retaildemand", async (req, res) => {
 
     const levels = ["silver", "gold", "platinum"];
     updatedTags = updatedTags.filter(tag => !levels.includes(tag));
-    
-    let sales = (salesAmount / 100) + retaildemand.cashSum + retaildemand.noCashSum;
 
-    if (sales >= 0 && sales <= 9999) {
+    if (salesAmount >= 0 && salesAmount <= 9999) {
       updatedTags.push("silver");
       groupChanged = true;
-    } else if (sales >= 10000 && sales <= 29999) {
+    } else if (salesAmount >= 10000 && salesAmount <= 29999) {
       updatedTags.push("gold");
       groupChanged = true;
-    } else if (sales >= 30000) {
+    } else if (salesAmount >= 30000) {
       updatedTags.push("platinum");
       groupChanged = true;
     }
@@ -310,8 +310,6 @@ app.post("/retaildemand", async (req, res) => {
       );
       console.log(updateResponse.data);
     }
-
-    res.status(201).send();
   } catch (error) {
     console.error("Ошибка при запросе к API МойСклад:", error);
     res.status(500).json({ error: "Ошибка при запросе к API МойСклад" });
