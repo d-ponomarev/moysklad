@@ -60,12 +60,12 @@ app.get("/counterparty", async (req, res) => {
 });
 
 app.post("/counterparty/detail", async (req, res) => {
-  const { meta } = req.body;
-  console.log(req.body);
+  const counterpartyData = req.body;
+  console.log(counterpartyData);
 
   try {
     const response = await axios.get(
-      `https://api.moysklad.ru/api/remap/1.2/entity/counterparty/${meta.id}`,
+      `https://api.moysklad.ru/api/remap/1.2/entity/counterparty/${counterpartyData.meta.id}`,
       {
         headers: {
           Authorization: `Bearer ${TOKEN}`,
@@ -84,6 +84,7 @@ app.post("/counterparty/detail", async (req, res) => {
         );
       }
 
+      console.log(bonusField ? bonusField.value : 0);
       res.status(200).json({
         bonusProgram: {
           agentBonusBalance: bonusField ? bonusField.value : 0,
