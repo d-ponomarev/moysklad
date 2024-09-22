@@ -95,90 +95,6 @@ app.post("/counterparty/detail", async (req, res) => {
   }
 });
 
-// app.post("/retaildemand/create", async (req, res) => {
-//   const { body } = req;
-
-//   if (
-//     !body.events ||
-//     !body.events[0] ||
-//     !body.events[0].meta ||
-//     !body.events[0].meta.href
-//   ) {
-//     return;
-//   }
-
-//   try {
-//     const orderUrl = body.events[0].meta.href;
-//     const orderResponse = await axios.get(orderUrl, {
-//       headers: {
-//         Authorization: `Bearer ${TOKEN}`,
-//         "Accept-Encoding": "gzip",
-//         "Content-Type": "application/json",
-//       },
-//     });
-
-//     const orderData = orderResponse.data;
-
-//     const counterpartyUrl = orderData.agent.meta.href;
-//     const counterpartyResponse = await axios.get(counterpartyUrl, {
-//       headers: {
-//         Authorization: `Bearer ${TOKEN}`,
-//         "Accept-Encoding": "gzip",
-//         "Content-Type": "application/json",
-//       },
-//     });
-
-//     const counterpartyData = counterpartyResponse.data;
-//     let tags = counterpartyData.tags || [];
-
-//     const salesAmount = counterpartyData.salesAmount;
-
-//     let updatedTags = [...tags.map((tag) => tag)];
-//     let groupChanged = false;
-
-//     if (
-//       salesAmount >= 100 &&
-//       salesAmount < 1000000 &&
-//       !updatedTags.includes("silver")
-//     ) {
-//       updatedTags.push("silver");
-//       groupChanged = true;
-//     } else if (salesAmount >= 1000000 && salesAmount < 3000000) {
-//       if (!updatedTags.includes("gold")) {
-//         updatedTags.push("gold");
-//         updatedTags = updatedTags.filter((tag) => tag !== "silver");
-//         groupChanged = true;
-//       }
-//     } else if (salesAmount >= 3000000 && !updatedTags.includes("platinum")) {
-//       updatedTags.push("platinum");
-//       updatedTags = updatedTags.filter((tag) => tag !== "gold");
-//       groupChanged = true;
-//     }
-
-//     if (groupChanged) {
-//       const counterpartyEditResponse = await axios.put(
-//         counterpartyUrl,
-//         {
-//           tags: updatedTags,
-//         },
-//         {
-//           headers: {
-//             Authorization: `Bearer ${TOKEN}`,
-//             "Accept-Encoding": "gzip",
-//             "Content-Type": "application/json",
-//           },
-//         }
-//       );
-//       console.log(`Теги обновлены: ${updatedTags}`);
-//     }
-
-//     res.status(200).json({ message: "Теги обновлены", updatedTags });
-//   } catch (error) {
-//     console.error("Ошибка при запросе к API МойСклад:", error);
-//     res.status(500).json({ error: "Ошибка при запросе к API МойСклад" });
-//   }
-// });
-
 app.post("/retaildemand/recalc", async (req, res) => {
   console.log(JSON.stringify(req.body, null, 2));
 
@@ -233,8 +149,6 @@ app.post("/retaildemand/recalc", async (req, res) => {
 
     if (bonusProgram.transactionType === "EARNING") {
       const bonusValueToEarn = Math.round((totalSum * earnPercent) / 100);
-      const maxBonusSpend = Math.round((totalSum * maxBonusSpendPercent) / 100);
-      const bonusValueToSpend = Math.min(bonusBalance, maxBonusSpend);
 
       const updatedPositions = positions.map((position) => {
         return {
@@ -266,7 +180,6 @@ app.post("/retaildemand/recalc", async (req, res) => {
         bonusProgram: {
           transactionType: "EARNING",
           agentBonusBalance: bonusBalance,
-          bonusValueToSpend: bonusValueToSpend,
           bonusValueToEarn: bonusValueToEarn,
           agentBonusBalanceAfter: Math.round(bonusBalance + bonusValueToEarn),
           paidByBonusPoints: 0
