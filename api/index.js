@@ -281,7 +281,7 @@ app.post("/retaildemand", async (req, res) => {
     const levels = ["silver", "gold", "platinum"];
     updatedTags = updatedTags.filter(tag => !levels.includes(tag));
 
-    if (salesAmount >= 1 && salesAmount <= 9999) {
+    if (salesAmount >= 0 && salesAmount <= 9999) {
       updatedTags.push("silver");
       groupChanged = true;
     } else if (salesAmount >= 10000 && salesAmount <= 29999) {
