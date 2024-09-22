@@ -266,36 +266,39 @@ app.post("/retaildemand", async (req, res) => {
     let tags = counterparty.tags;
     const salesAmount = counterparty.salesAmount / 100;
     
-    let updatedTags = [...tags.map((tag) => tag)];
+    let updatedTags = [...tags];
 
     let bonusField = null;
     if (counterparty.attributes && counterparty.attributes.length > 0) {
       bonusField = counterparty.attributes.find((attr) => attr.name === "Бонусы");
-      bonusField.value = bonusField.value - retaildemand.bonusProgram.bonusValueToSpend + retaildemand.bonusProgram.bonusValueToEarn;
+      if (bonusField) {
+        bonusField.value = bonusField.value - retaildemand.bonusProgram.bonusValueToSpend + retaildemand.bonusProgram.bonusValueToEarn;
+      }
     }
 
     let groupChanged = false;
 
-    if (salesAmount >= 1 && salesAmount <= 9999 && !updatedTags.includes("silver")) {
+    const levels = ["silver", "gold", "platinum"];
+    updatedTags = updatedTags.filter(tag => !levels.includes(tag));
+
+    if (salesAmount >= 1 && salesAmount <= 9999) {
       updatedTags.push("silver");
       groupChanged = true;
-    } else if (salesAmount >= 10000 && salesAmount <= 29999 && !updatedTags.includes("gold")) {
+    } else if (salesAmount >= 10000 && salesAmount <= 29999) {
       updatedTags.push("gold");
-      updatedTags = updatedTags.filter((tag) => tag !== "silver");
       groupChanged = true;
-    } else if (salesAmount >= 30000 && !updatedTags.includes("platinum")) {
+    } else if (salesAmount >= 30000) {
       updatedTags.push("platinum");
-      updatedTags = updatedTags.filter((tag) => tag !== "gold");
       groupChanged = true;
     }
 
-    if (groupChanged) {
-      const response = await axios.put(
+    if (groupChanged || bonusField) {
+      const updatedData = { tags: updatedTags };
+      if (bonusField) updatedData.attributes = [bonusField];
+
+      const updateResponse = await axios.put(
         `https://api.moysklad.ru/api/remap/1.2/entity/counterparty/${retaildemand.agent.meta.id}`,
-        {
-          tags: updatedTags,
-          attributes: [bonusField]
-        },
+        updatedData,
         {
           headers: {
             Authorization: `Bearer ${TOKEN}`,
@@ -303,21 +306,14 @@ app.post("/retaildemand", async (req, res) => {
           },
         }
       );
-      console.log(response.data);
+      console.log(updateResponse.data);
     }
 
-    console.log(updatedTags);
-    console.log(bonusField.value);
-
     res.status(201);
-    
   } catch (error) {
     console.error("Ошибка при запросе к API МойСклад:", error);
     res.status(500).json({ error: "Ошибка при запросе к API МойСклад" });
   }
-
-
-  res.status(201).json({ message: "Success" });
 });
 
 const port = process.env.PORT || 3000;
