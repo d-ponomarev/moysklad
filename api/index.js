@@ -128,9 +128,9 @@ app.post("/retaildemand/recalc", async (req, res) => {
     let earnPercent = 0;
     let maxBonusSpendPercent = 0;
 
-    if (tags.includes("партнер ")) {
+    if (tags.includes("партнер")) {
       earnPercent = 20;
-      maxBonusSpendPercent = 50 ;
+      maxBonusSpendPercent = 50;
     } else if (tags.includes("silver")) {
       earnPercent = 5;
       maxBonusSpendPercent = 30;
@@ -250,6 +250,8 @@ app.post("/retaildemand", (req, res) => {
   console.log(JSON.stringify(req.body, null, 2));
   const retaildemand = req.body;
 
+  res.status(201).send();
+
   (async () => {
     try {
       const response = await axios.get(
@@ -309,8 +311,6 @@ app.post("/retaildemand", (req, res) => {
         );
         console.log(updateResponse.data);
       }
-  
-      res.status(201).send();
     } catch (error) {
       console.error("Ошибка при запросе к API МойСклад:", error);
       res.status(500).json({ error: "Ошибка при запросе к API МойСклад" });
