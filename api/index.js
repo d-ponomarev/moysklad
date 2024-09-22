@@ -61,7 +61,6 @@ app.get("/counterparty", async (req, res) => {
 
 app.post("/counterparty/detail", async (req, res) => {
   const counterpartyData = req.body;
-  console.log(counterpartyData);
 
   try {
     const response = await axios.get(
@@ -79,12 +78,9 @@ app.post("/counterparty/detail", async (req, res) => {
     if (counterparty.id) {
       let bonusField = null;
       if (counterparty.attributes && counterparty.attributes.length > 0) {
-        bonusField = counterparty.attributes.find(
-          (attr) => attr.name === "Бонусы"
-        );
+        bonusField = counterparty.attributes.find((attr) => attr.name === "Бонусы");
       }
 
-      console.log(bonusField ? bonusField.value : 0);
       res.status(200).json({
         bonusProgram: {
           agentBonusBalance: bonusField ? bonusField.value : 0,
@@ -99,89 +95,89 @@ app.post("/counterparty/detail", async (req, res) => {
   }
 });
 
-app.post("/retaildemand/create", async (req, res) => {
-  const { body } = req;
+// app.post("/retaildemand/create", async (req, res) => {
+//   const { body } = req;
 
-  if (
-    !body.events ||
-    !body.events[0] ||
-    !body.events[0].meta ||
-    !body.events[0].meta.href
-  ) {
-    return;
-  }
+//   if (
+//     !body.events ||
+//     !body.events[0] ||
+//     !body.events[0].meta ||
+//     !body.events[0].meta.href
+//   ) {
+//     return;
+//   }
 
-  try {
-    const orderUrl = body.events[0].meta.href;
-    const orderResponse = await axios.get(orderUrl, {
-      headers: {
-        Authorization: `Bearer ${TOKEN}`,
-        "Accept-Encoding": "gzip",
-        "Content-Type": "application/json",
-      },
-    });
+//   try {
+//     const orderUrl = body.events[0].meta.href;
+//     const orderResponse = await axios.get(orderUrl, {
+//       headers: {
+//         Authorization: `Bearer ${TOKEN}`,
+//         "Accept-Encoding": "gzip",
+//         "Content-Type": "application/json",
+//       },
+//     });
 
-    const orderData = orderResponse.data;
+//     const orderData = orderResponse.data;
 
-    const counterpartyUrl = orderData.agent.meta.href;
-    const counterpartyResponse = await axios.get(counterpartyUrl, {
-      headers: {
-        Authorization: `Bearer ${TOKEN}`,
-        "Accept-Encoding": "gzip",
-        "Content-Type": "application/json",
-      },
-    });
+//     const counterpartyUrl = orderData.agent.meta.href;
+//     const counterpartyResponse = await axios.get(counterpartyUrl, {
+//       headers: {
+//         Authorization: `Bearer ${TOKEN}`,
+//         "Accept-Encoding": "gzip",
+//         "Content-Type": "application/json",
+//       },
+//     });
 
-    const counterpartyData = counterpartyResponse.data;
-    let tags = counterpartyData.tags || [];
+//     const counterpartyData = counterpartyResponse.data;
+//     let tags = counterpartyData.tags || [];
 
-    const salesAmount = counterpartyData.salesAmount;
+//     const salesAmount = counterpartyData.salesAmount;
 
-    let updatedTags = [...tags.map((tag) => tag)];
-    let groupChanged = false;
+//     let updatedTags = [...tags.map((tag) => tag)];
+//     let groupChanged = false;
 
-    if (
-      salesAmount >= 100 &&
-      salesAmount < 1000000 &&
-      !updatedTags.includes("silver")
-    ) {
-      updatedTags.push("silver");
-      groupChanged = true;
-    } else if (salesAmount >= 1000000 && salesAmount < 3000000) {
-      if (!updatedTags.includes("gold")) {
-        updatedTags.push("gold");
-        updatedTags = updatedTags.filter((tag) => tag !== "silver");
-        groupChanged = true;
-      }
-    } else if (salesAmount >= 3000000 && !updatedTags.includes("platinum")) {
-      updatedTags.push("platinum");
-      updatedTags = updatedTags.filter((tag) => tag !== "gold");
-      groupChanged = true;
-    }
+//     if (
+//       salesAmount >= 100 &&
+//       salesAmount < 1000000 &&
+//       !updatedTags.includes("silver")
+//     ) {
+//       updatedTags.push("silver");
+//       groupChanged = true;
+//     } else if (salesAmount >= 1000000 && salesAmount < 3000000) {
+//       if (!updatedTags.includes("gold")) {
+//         updatedTags.push("gold");
+//         updatedTags = updatedTags.filter((tag) => tag !== "silver");
+//         groupChanged = true;
+//       }
+//     } else if (salesAmount >= 3000000 && !updatedTags.includes("platinum")) {
+//       updatedTags.push("platinum");
+//       updatedTags = updatedTags.filter((tag) => tag !== "gold");
+//       groupChanged = true;
+//     }
 
-    if (groupChanged) {
-      const counterpartyEditResponse = await axios.put(
-        counterpartyUrl,
-        {
-          tags: updatedTags,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${TOKEN}`,
-            "Accept-Encoding": "gzip",
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      console.log(`Теги обновлены: ${updatedTags}`);
-    }
+//     if (groupChanged) {
+//       const counterpartyEditResponse = await axios.put(
+//         counterpartyUrl,
+//         {
+//           tags: updatedTags,
+//         },
+//         {
+//           headers: {
+//             Authorization: `Bearer ${TOKEN}`,
+//             "Accept-Encoding": "gzip",
+//             "Content-Type": "application/json",
+//           },
+//         }
+//       );
+//       console.log(`Теги обновлены: ${updatedTags}`);
+//     }
 
-    res.status(200).json({ message: "Теги обновлены", updatedTags });
-  } catch (error) {
-    console.error("Ошибка при запросе к API МойСклад:", error);
-    res.status(500).json({ error: "Ошибка при запросе к API МойСклад" });
-  }
-});
+//     res.status(200).json({ message: "Теги обновлены", updatedTags });
+//   } catch (error) {
+//     console.error("Ошибка при запросе к API МойСклад:", error);
+//     res.status(500).json({ error: "Ошибка при запросе к API МойСклад" });
+//   }
+// });
 
 app.post("/retaildemand/recalc", async (req, res) => {
   console.log(JSON.stringify(req.body, null, 2));
@@ -337,8 +333,74 @@ app.post("/retaildemand/recalc", async (req, res) => {
   }
 });
 
-app.post("/retaildemand", (req, res) => {
+app.post("/retaildemand", async (req, res) => {
   console.log(JSON.stringify(req.body, null, 2));
+  const retaildemand = req.body;
+
+  try {
+    const response = await axios.get(
+      `https://api.moysklad.ru/api/remap/1.2/entity/counterparty/${retaildemand.agent.meta.id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${TOKEN}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const counterparty = response.data;
+
+    let tags = counterparty.tags;
+    const salesAmount = counterparty.salesAmount / 100;
+    
+    let updatedTags = [...tags.map((tag) => tag)];
+
+    let bonusField = null;
+    if (counterparty.attributes && counterparty.attributes.length > 0) {
+      bonusField = counterparty.attributes.find((attr) => attr.name === "Бонусы");
+      bonusField.value = bonusField.value - retaildemand.bonusProgram.bonusValueToSpend + retaildemand.bonusProgram.bonusValueToEarn;
+    }
+
+    let groupChanged = false;
+
+    if (salesAmount >= 1 && salesAmount <= 9999 && !updatedTags.includes("silver")) {
+      updatedTags.push("silver");
+      groupChanged = true;
+    } else if (salesAmount >= 10000 && salesAmount <= 29999 && !updatedTags.includes("gold")) {
+      updatedTags.push("gold");
+      updatedTags = updatedTags.filter((tag) => tag !== "silver");
+      groupChanged = true;
+    } else if (salesAmount >= 30000 && !updatedTags.includes("platinum")) {
+      updatedTags.push("platinum");
+      updatedTags = updatedTags.filter((tag) => tag !== "gold");
+      groupChanged = true;
+    }
+
+    if (groupChanged) {
+      const response = await axios.put(
+        `https://api.moysklad.ru/api/remap/1.2/entity/counterparty/${retaildemand.agent.meta.id}`,
+        {
+          tags: updatedTags,
+          attributes: [bonusField]
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${TOKEN}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log(updatedTags, bonusField.value);
+    }
+
+    res.status(201);
+    
+  } catch (error) {
+    console.error("Ошибка при запросе к API МойСклад:", error);
+    res.status(500).json({ error: "Ошибка при запросе к API МойСклад" });
+  }
+
+
   res.status(201).json({ message: "Success" });
 });
 
