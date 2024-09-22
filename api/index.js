@@ -390,8 +390,11 @@ app.post("/retaildemand", async (req, res) => {
           },
         }
       );
-      console.log(updatedTags, bonusField.value);
+      console.log(response);
     }
+
+    console.log(updatedTags);
+    console.log(bonusField.value);
 
     res.status(201);
     
