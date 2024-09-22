@@ -309,7 +309,7 @@ app.post("/retaildemand", async (req, res) => {
       console.log(updateResponse.data);
     }
 
-    res.status(201);
+    res.status(201).send();
   } catch (error) {
     console.error("Ошибка при запросе к API МойСклад:", error);
     res.status(500).json({ error: "Ошибка при запросе к API МойСклад" });
