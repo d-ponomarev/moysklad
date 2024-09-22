@@ -250,8 +250,6 @@ app.post("/retaildemand", async (req, res) => {
   console.log(JSON.stringify(req.body, null, 2));
   const retaildemand = req.body;
 
-  res.status(201).send();
-
   try {
     const response = await axios.get(
       `https://api.moysklad.ru/api/remap/1.2/entity/counterparty/${retaildemand.agent.meta.id}`,
@@ -310,6 +308,8 @@ app.post("/retaildemand", async (req, res) => {
       );
       console.log(updateResponse.data);
     }
+
+    res.status(201).send();
   } catch (error) {
     console.error("Ошибка при запросе к API МойСклад:", error);
     res.status(500).json({ error: "Ошибка при запросе к API МойСклад" });
