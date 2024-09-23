@@ -216,9 +216,6 @@ app.post("/retaildemand/recalc", async (req, res) => {
 
     const maxBonusSpend = Math.round((totalSum * maxBonusSpendPercent) / 100);
     const bonusValueToSpend = Math.min(bonusBalance, maxBonusSpend);
-    
-    const remainingSum = totalSum - bonusValueToSpend;
-    // const bonusValueToEarn = Math.round((remainingSum * earnPercent) / 100);
 
     const updatedPositions = productDetails.map((position) => {
       const productPathName = position.productDetails.pathName || "";
@@ -258,7 +255,7 @@ app.post("/retaildemand/recalc", async (req, res) => {
         sex: agent.sex,
         birthDate: agent.birthDate
       },
-      positions: updatedPositions,
+      positions: updatedPositions.map(({ limitedEarnPercent, ...rest }) => rest),
       bonusProgram: {
         transactionType: "SPENDING",
         agentBonusBalance: bonusBalance,
