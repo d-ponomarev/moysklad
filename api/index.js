@@ -256,7 +256,19 @@ app.post("/retaildemand/recalc", async (req, res) => {
 
     const updatedPositions = productDetails.map((position) => {
       const productPathName = position.productDetails.pathName || "";
-      const limitedEarnPercent = position.restrictCashback ? 0 : (isLimitedCategory(productPathName) ? 5 : earnPercent);
+
+      if (position.restrictCashback) {
+        return {
+          assortment: position.assortment,
+          quantity: position.quantity,
+          price: position.price.toFixed(2),
+          discountPercent: 0,
+          discountedPrice: position.price.toFixed(2),
+          bonusValueToEarn: 0
+        };
+      }
+
+      const limitedEarnPercent = position.fixedCashback !== null ? position.fixedCashback : (isLimitedCategory(productPathName) ? 5 : earnPercent);
 
       const discountPercent = (bonusValueToSpend / totalSum) * 100;
       const discountedPrice = position.price - (position.price * discountPercent) / 100;
