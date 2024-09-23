@@ -152,13 +152,17 @@ app.post("/retaildemand/recalc", async (req, res) => {
         },
       });
 
-      const restrictCashbackAttr = productResponse.data.attributes.find((attr) => attr.name === "Ограничить кеш-бек");
-      const restrictCashback = restrictCashbackAttr ? restrictCashbackAttr.value : false;
+      const restrictCashbackField = productResponse.data.attributes.find((attr) => attr.name === "Ограничить кеш-бек");
+      const restrictCashback = restrictCashbackField ? restrictCashbackField.value : false;
+
+      const fixedCashbackField = productResponse.data.attributes.find((attr) => attr.name === "Фиксированный кеш-бек");
+      const fixedCashback = fixedCashbackField ? fixedCashbackField.value : null;
       
       return { 
         ...position,
         productDetails: productResponse.data,
-        restrictCashback
+        restrictCashback,
+        fixedCashback
       };
     }));
 
@@ -175,8 +179,32 @@ app.post("/retaildemand/recalc", async (req, res) => {
       const updatedPositions = productDetails.map((position) => {
         const productPathName = position.productDetails.pathName || "";
 
-        const limitedEarnPercent = position.restrictCashback ? 0 : (isLimitedCategory(productPathName) ? 5 : earnPercent);
+        if (position.restrictCashback) {
+          return {
+            assortment: position.assortment,
+            quantity: position.quantity,
+            price: position.price.toFixed(2),
+            discountPercent: discount ? discount.toFixed(2) : 0,
+            discountedPrice: position.price.toFixed(2),
+            bonusValueToEarn: 0
+          };
+        }
 
+        if (position.fixedCashback !== null) {
+          const bonusValueToEarn = position.fixedCashback * position.quantity;
+          const discountedPrice = discount ? position.price - (position.price * discount / 100) : position.price;
+
+          return {
+            assortment: position.assortment,
+            quantity: position.quantity,
+            price: position.price.toFixed(2),
+            discountPercent: discount ? discount.toFixed(2) : 0,
+            discountedPrice: discountedPrice.toFixed(2),
+            bonusValueToEarn
+          };
+        }
+
+        const limitedEarnPercent = isLimitedCategory(productPathName) ? 5 : earnPercent;
         const bonusValueToEarn = Math.round((position.price * position.quantity * limitedEarnPercent) / 100);
         const discountedPrice = discount ? position.price - (position.price * discount / 100) : position.price;
 
