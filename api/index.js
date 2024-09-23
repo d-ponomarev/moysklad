@@ -203,8 +203,8 @@ app.post("/retaildemand/recalc", async (req, res) => {
         bonusProgram: {
           transactionType: "EARNING",
           agentBonusBalance: bonusBalance,
-          bonusValueToEarn: bonusValueToEarn,
-          agentBonusBalanceAfter: Math.round(bonusBalance + bonusValueToEarn),
+          bonusValueToEarn: totalBonusToEarn,
+          agentBonusBalanceAfter: Math.round(bonusBalance + totalBonusToEarn),
           paidByBonusPoints: 0
         },
         needVerification: false
