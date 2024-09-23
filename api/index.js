@@ -191,7 +191,7 @@ app.post("/retaildemand/recalc", async (req, res) => {
         }
 
         if (position.fixedCashback !== null) {
-          const bonusValueToEarn = position.fixedCashback * position.quantity;
+          const bonusValueToEarn = Math.round((position.price * position.quantity * position.fixedCashback) / 100);
           const discountedPrice = discount ? position.price - (position.price * discount / 100) : position.price;
 
           return {
