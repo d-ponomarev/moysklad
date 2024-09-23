@@ -102,8 +102,7 @@ app.post("/retaildemand/recalc", async (req, res) => {
 
   try {
     const response = await axios.get(
-      `https://api.moysklad.ru/api/remap/1.2/entity/counterparty/${agent.meta.id}`,
-      {
+      `https://api.moysklad.ru/api/remap/1.2/entity/counterparty/${agent.meta.id}`, {
         headers: {
           Authorization: `Bearer ${TOKEN}`,
           "Content-Type": "application/json",
@@ -145,24 +144,44 @@ app.post("/retaildemand/recalc", async (req, res) => {
       maxBonusSpendPercent = 50;
     }
 
+    const productDetails = await Promise.all(positions.map(async (position) => {
+      const productResponse = await axios.get(`https://api.moysklad.ru/api/remap/1.2/entity/product/${position.assortment.meta.id}`, {
+        headers: {
+          Authorization: `Bearer ${TOKEN}`,
+          "Content-Type": "application/json",
+        },
+      });
+      return { ...position, productDetails: productResponse.data };
+    }));
+
     let totalSum = 0;
-    positions.forEach(position => {
+    productDetails.forEach(position => {
       totalSum += position.quantity * position.price;
     });
 
-    if (bonusProgram.transactionType === "EARNING") {
-      const bonusValueToEarn = Math.round((totalSum * earnPercent) / 100);
+    const isLimitedCategory = (pathName) => {
+      return pathName === "кондитерка" || pathName === "напитки";
+    };
 
-      const updatedPositions = positions.map((position) => {
+    if (bonusProgram.transactionType === "EARNING") {
+      const updatedPositions = productDetails.map((position) => {
+        const productPathName = position.productDetails.pathName || "";
+        const limitedEarnPercent = isLimitedCategory(productPathName) ? 5 : earnPercent;
+
+        const bonusValueToEarn = Math.round((position.price * position.quantity * limitedEarnPercent) / 100);
         const discountedPrice = discount ? position.price - (position.price * discount / 100) : position.price;
+
         return {
           assortment: position.assortment,
           quantity: position.quantity,
           price: position.price.toFixed(2),
           discountPercent: discount ? discount.toFixed(2) : 0,
-          discountedPrice: discountedPrice.toFixed(2)
+          discountedPrice: discountedPrice.toFixed(2),
+          bonusValueToEarn
         };
       });
+
+      const totalBonusToEarn = updatedPositions.reduce((sum, pos) => sum + pos.bonusValueToEarn, 0);
 
       const result = {
         agent: {
@@ -180,7 +199,7 @@ app.post("/retaildemand/recalc", async (req, res) => {
           sex: agent.sex,
           birthDate: agent.birthDate
         },
-        positions: updatedPositions,
+        positions: updatedPositions.map(({ bonusValueToEarn, ...rest }) => rest),
         bonusProgram: {
           transactionType: "EARNING",
           agentBonusBalance: bonusBalance,
@@ -201,7 +220,7 @@ app.post("/retaildemand/recalc", async (req, res) => {
     const remainingSum = totalSum - bonusValueToSpend;
     const bonusValueToEarn = Math.round((remainingSum * earnPercent) / 100);
 
-    const updatedPositions = positions.map((position) => {
+    const updatedPositions = productDetails.map((position) => {
       const discountPercent = (bonusValueToSpend / totalSum) * 100;
       const discountedPrice = position.price - (position.price * discountPercent) / 100;
       return {
