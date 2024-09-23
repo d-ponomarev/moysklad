@@ -152,7 +152,7 @@ app.post("/retaildemand/recalc", async (req, res) => {
         },
       });
 
-      const restrictCashbackAttr = productResponse.data.attributes.find(attr => attr.name === "Ограничить кеш-бек");
+      const restrictCashbackAttr = productResponse.data.attributes.find((attr) => attr.name === "Ограничить кеш-бек");
       const restrictCashback = restrictCashbackAttr ? restrictCashbackAttr.value : false;
       
       return { 
