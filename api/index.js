@@ -218,19 +218,29 @@ app.post("/retaildemand/recalc", async (req, res) => {
     const bonusValueToSpend = Math.min(bonusBalance, maxBonusSpend);
     
     const remainingSum = totalSum - bonusValueToSpend;
-    const bonusValueToEarn = Math.round((remainingSum * earnPercent) / 100);
+    // const bonusValueToEarn = Math.round((remainingSum * earnPercent) / 100);
 
     const updatedPositions = productDetails.map((position) => {
+      const productPathName = position.productDetails.pathName || "";
+      const limitedEarnPercent = isLimitedCategory(productPathName) ? 5 : earnPercent;
+
       const discountPercent = (bonusValueToSpend / totalSum) * 100;
       const discountedPrice = position.price - (position.price * discountPercent) / 100;
+
       return {
         assortment: position.assortment,
         quantity: position.quantity,
         price: position.price.toFixed(2),
         discountPercent: discountPercent.toFixed(2),
-        discountedPrice: discountedPrice.toFixed(2)
+        discountedPrice: discountedPrice.toFixed(2),
+        limitedEarnPercent
       };
     });
+
+    const bonusValueToEarn = updatedPositions.reduce((total, position) => {
+      const earnedBonus = Math.round((position.discountedPrice * position.quantity * position.limitedEarnPercent) / 100);
+      return total + earnedBonus;
+    }, 0);
 
     const result = {
       agent: {
