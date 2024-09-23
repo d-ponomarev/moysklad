@@ -127,8 +127,11 @@ app.post("/retaildemand/recalc", async (req, res) => {
 
     let earnPercent = 0;
     let maxBonusSpendPercent = 0;
+    let discount = 0;
 
-    if (tags.includes("партнер")) {
+    if (tags.includes("сотрудник")) {
+      discount = 20;
+    } else if (tags.includes("партнер")) {
       earnPercent = 20;
       maxBonusSpendPercent = 50;
     } else if (tags.includes("silver")) {
@@ -151,12 +154,13 @@ app.post("/retaildemand/recalc", async (req, res) => {
       const bonusValueToEarn = Math.round((totalSum * earnPercent) / 100);
 
       const updatedPositions = positions.map((position) => {
+        const discountedPrice = discount ? position.price - (position.price * discount / 100) : position.price;
         return {
           assortment: position.assortment,
           quantity: position.quantity,
-          price: position.price,
-          discountPercent: 0,
-          discountedPrice: position.price
+          price: position.price.toFixed(2),
+          discountPercent: discount ? discount.toFixed(2) : 0,
+          discountedPrice: discountedPrice.toFixed(2)
         };
       });
 
@@ -203,7 +207,7 @@ app.post("/retaildemand/recalc", async (req, res) => {
       return {
         assortment: position.assortment,
         quantity: position.quantity,
-        price: position.price,
+        price: position.price.toFixed(2),
         discountPercent: discountPercent.toFixed(2),
         discountedPrice: discountedPrice.toFixed(2)
       };
