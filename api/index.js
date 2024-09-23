@@ -151,7 +151,15 @@ app.post("/retaildemand/recalc", async (req, res) => {
           "Content-Type": "application/json",
         },
       });
-      return { ...position, productDetails: productResponse.data };
+
+      const restrictCashbackAttr = productResponse.data.attributes.find(attr => attr.name === "Ограничить кеш-бек");
+      const restrictCashback = restrictCashbackAttr ? restrictCashbackAttr.value : false;
+      
+      return { 
+        ...position,
+        productDetails: productResponse.data,
+        restrictCashback
+      };
     }));
 
     let totalSum = 0;
@@ -166,7 +174,8 @@ app.post("/retaildemand/recalc", async (req, res) => {
     if (bonusProgram.transactionType === "EARNING") {
       const updatedPositions = productDetails.map((position) => {
         const productPathName = position.productDetails.pathName || "";
-        const limitedEarnPercent = isLimitedCategory(productPathName) ? 5 : earnPercent;
+
+        const limitedEarnPercent = position.restrictCashback ? 0 : (isLimitedCategory(productPathName) ? 5 : earnPercent);
 
         const bonusValueToEarn = Math.round((position.price * position.quantity * limitedEarnPercent) / 100);
         const discountedPrice = discount ? position.price - (position.price * discount / 100) : position.price;
@@ -219,7 +228,7 @@ app.post("/retaildemand/recalc", async (req, res) => {
 
     const updatedPositions = productDetails.map((position) => {
       const productPathName = position.productDetails.pathName || "";
-      const limitedEarnPercent = isLimitedCategory(productPathName) ? 5 : earnPercent;
+      const limitedEarnPercent = position.restrictCashback ? 0 : (isLimitedCategory(productPathName) ? 5 : earnPercent);
 
       const discountPercent = (bonusValueToSpend / totalSum) * 100;
       const discountedPrice = position.price - (position.price * discountPercent) / 100;
