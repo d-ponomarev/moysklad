@@ -258,12 +258,15 @@ app.post("/retaildemand/recalc", async (req, res) => {
       const productPathName = position.productDetails.pathName || "";
 
       if (position.restrictCashback) {
+        const discountPercent = (bonusValueToSpend / totalSum) * 100;
+        const discountedPrice = position.price - (position.price * discountPercent) / 100;
+
         return {
           assortment: position.assortment,
           quantity: position.quantity,
           price: position.price.toFixed(2),
-          discountPercent: 0,
-          discountedPrice: position.price.toFixed(2),
+          discountPercent: discountPercent.toFixed(2),
+          discountedPrice: discountedPrice.toFixed(2),
           bonusValueToEarn: 0
         };
       }
