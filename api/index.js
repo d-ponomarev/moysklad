@@ -252,7 +252,7 @@ app.post("/retaildemand/recalc", async (req, res) => {
     }
 
     const maxBonusSpend = Math.round((totalSum * maxBonusSpendPercent) / 100);
-    const bonusValueToSpend = Math.min(bonusBalance, maxBonusSpend);
+    const bonusValueToSpend = Math.min(preferredBonusToSpend || bonusBalance, maxBonusSpend);
 
     const updatedPositions = productDetails.map((position) => {
       const productPathName = position.productDetails.pathName || "";
@@ -273,20 +273,20 @@ app.post("/retaildemand/recalc", async (req, res) => {
       const discountPercent = (bonusValueToSpend / totalSum) * 100;
       const discountedPrice = position.price - (position.price * discountPercent) / 100;
 
+      const bonusValueToEarn = Math.round((discountedPrice * position.quantity * limitedEarnPercent) / 100);
+
       return {
         assortment: position.assortment,
         quantity: position.quantity,
         price: position.price.toFixed(2),
         discountPercent: discountPercent.toFixed(2),
         discountedPrice: discountedPrice.toFixed(2),
-        limitedEarnPercent
+        bonusValueToEarn 
       };
     });
 
-    const bonusValueToEarn = updatedPositions.reduce((total, position) => {
-      const earnedBonus = Math.round((position.discountedPrice * position.quantity * position.limitedEarnPercent) / 100);
-      return total + earnedBonus;
-    }, 0);
+    const totalBonusValueToEarn = updatedPositions.reduce((total, position) => total + position.bonusValueToEarn, 0);
+    const agentBonusBalanceAfter = bonusBalance - bonusValueToSpend + totalBonusValueToEarn;
 
     const result = {
       agent: {
@@ -309,8 +309,8 @@ app.post("/retaildemand/recalc", async (req, res) => {
         transactionType: "SPENDING",
         agentBonusBalance: bonusBalance,
         bonusValueToSpend: bonusValueToSpend,
-        bonusValueToEarn: bonusValueToEarn,
-        agentBonusBalanceAfter: (bonusBalance - bonusValueToSpend + bonusValueToEarn),
+        bonusValueToEarn: totalBonusValueToEarn,
+        agentBonusBalanceAfter: agentBonusBalanceAfter,
         paidByBonusPoints: bonusValueToSpend
       },
       needVerification: false
