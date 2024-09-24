@@ -20,7 +20,7 @@ const verifyAuthToken = (req, res, next) => {
 
 app.use(verifyAuthToken);
 
-app.get("/counterparty", async (req, res) => {
+app.get("/roman/counterparty", async (req, res) => {
   const { search } = req.query;
 
   if (!search) {
@@ -59,7 +59,7 @@ app.get("/counterparty", async (req, res) => {
   }
 });
 
-app.post("/counterparty/detail", async (req, res) => {
+app.post("/roman/counterparty/detail", async (req, res) => {
   const counterpartyData = req.body;
 
   try {
@@ -95,7 +95,7 @@ app.post("/counterparty/detail", async (req, res) => {
   }
 });
 
-app.post("/retaildemand/recalc", async (req, res) => {
+app.post("/roman/retaildemand/recalc", async (req, res) => {
   console.log(JSON.stringify(req.body, null, 2));
 
   const { positions, agent, bonusProgram, preferredBonusToSpend } = req.body;
@@ -328,7 +328,7 @@ app.post("/retaildemand/recalc", async (req, res) => {
   }
 });
 
-app.post("/retaildemand", async (req, res) => {
+app.post("/roman/retaildemand", async (req, res) => {
   console.log(JSON.stringify(req.body, null, 2));
   const retaildemand = req.body;
 
