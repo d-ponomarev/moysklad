@@ -252,7 +252,7 @@ app.post("/retaildemand/recalc", async (req, res) => {
     }
 
     const maxBonusSpend = Math.round((totalSum * maxBonusSpendPercent) / 100);
-    const bonusValueToSpend = Math.min(bonusBalance, maxBonusSpend);
+    const bonusValueToSpend = Math.min(preferredBonusToSpend || bonusBalance, maxBonusSpend);
 
     const updatedPositions = productDetails.map((position) => {
       const productPathName = position.productDetails.pathName || "";
