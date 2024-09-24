@@ -304,7 +304,7 @@ app.post("/retaildemand/recalc", async (req, res) => {
         sex: agent.sex,
         birthDate: agent.birthDate
       },
-      positions: updatedPositions.map(({ limitedEarnPercent, ...rest }) => rest),
+      positions: updatedPositions.map(({ bonusValueToEarn, ...rest }) => rest),
       bonusProgram: {
         transactionType: "SPENDING",
         agentBonusBalance: bonusBalance,
