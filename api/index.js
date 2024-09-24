@@ -7,10 +7,6 @@ const TOKEN = "e8d72cbb586832eb3715b04ce61e17cda8d65048";
 app.use(express.json());
 
 const verifyAuthToken = (req, res, next) => {
-  if (req.path === "/retaildemand/create") {
-    return next();
-  }
-
   const authToken = req.headers["lognex-discount-api-auth-token"];
   if (authToken !== "123") {
     return res.status(401).json({ error: "Неверный токен авторизации" });
@@ -40,7 +36,7 @@ app.get("/roman/counterparty", async (req, res) => {
 
     const counterparty = response.data;
 
-    if (counterparty.id) {
+    if (counterparty && counterparty.id) {
       res.status(200).json({
         rows: [
           {
@@ -75,7 +71,7 @@ app.post("/roman/counterparty/detail", async (req, res) => {
 
     const counterparty = response.data;
 
-    if (counterparty.id) {
+    if (counterparty && counterparty.id) {
       let bonusField = null;
       if (counterparty.attributes && counterparty.attributes.length > 0) {
         bonusField = counterparty.attributes.find((attr) => attr.name === "Бонусы");
@@ -112,7 +108,7 @@ app.post("/roman/retaildemand/recalc", async (req, res) => {
 
     const counterparty = response.data;
 
-    if (!counterparty.id) {
+    if (!counterparty || !counterparty.id) {
       return res.status(404).json({ error: "Контрагент не найден" });
     }
 
@@ -152,10 +148,12 @@ app.post("/roman/retaildemand/recalc", async (req, res) => {
         },
       });
 
-      const restrictCashbackField = productResponse.data.attributes.find((attr) => attr.name === "Ограничить кеш-бек");
+      const attributes = productResponse.data.attributes || [];
+
+      const restrictCashbackField = attributes.find((attr) => attr.name === "Ограничить кеш-бек");
       const restrictCashback = restrictCashbackField ? restrictCashbackField.value : false;
 
-      const fixedCashbackField = productResponse.data.attributes.find((attr) => attr.name === "Фиксированный кеш-бек");
+      const fixedCashbackField = attributes.find((attr) => attr.name === "Фиксированный кеш-бек");
       const fixedCashback = fixedCashbackField ? fixedCashbackField.value : null;
       
       return { 
