@@ -2,13 +2,13 @@ const express = require("express");
 const axios = require("axios");
 const app = express();
 
-const TOKEN = "0c4181afe9dd6c0db62b1fc0ab2a5f7cfc341bac";
+const TOKEN = "956689e54fd4dafe4fddddb02cb33ceb3620ea6b";
 
 app.use(express.json());
 
 const verifyAuthToken = (req, res, next) => {
   const authToken = req.headers["lognex-discount-api-auth-token"];
-  if (authToken !== "123") {
+  if (authToken !== "2Ky3H8B6xeo5") {
     return res.status(401).json({ error: "Неверный токен авторизации" });
   }
   next();
@@ -119,26 +119,13 @@ app.post("/roman/retaildemand/recalc", async (req, res) => {
 
     const bonusBalance = bonusField ? bonusField.value : 0;
     const tags = counterparty.tags || [];
-    const salesAmount = counterparty.salesAmount / 100;
 
-    let earnPercent = 0;
-    let maxBonusSpendPercent = 0;
+    let earnPercent = 5;
+    let maxBonusSpendPercent = 30;
     let discount = 0;
 
     if (tags.includes("сотрудник")) {
       discount = 20;
-    } else if (tags.includes("алексфитнесс")) {
-      discount = 15;
-    } else if (tags.includes("premium")) {
-      discount = 10;
-    } else if (tags.includes("vip")) {
-      discount = 5;
-    } else if (tags.includes("покупатель") && salesAmount >= 15000) {
-      discount = 10;
-    } else if ((tags.includes("vip") || tags.includes("покупатель")) && salesAmount >= 5000) {
-      discount = 5;
-    } else if (tags.includes("тренер")) {
-      discount = 5;
     } else if (tags.includes("партнер")) {
       earnPercent = 20;
       maxBonusSpendPercent = 50;
@@ -183,7 +170,7 @@ app.post("/roman/retaildemand/recalc", async (req, res) => {
     });
 
     const isLimitedCategory = (pathName) => {
-      return pathName === "Кондитерка" || pathName === "Напиток";
+      return pathName === "Кондитерка" || pathName === "Напитки";
     };
 
     if (bonusProgram.transactionType === "EARNING") {
@@ -265,36 +252,36 @@ app.post("/roman/retaildemand/recalc", async (req, res) => {
     const maxBonusSpend = Math.round((totalSum * maxBonusSpendPercent) / 100);
     const bonusValueToSpend = Math.min(preferredBonusToSpend || bonusBalance, maxBonusSpend);
 
+    const totalSumAfterDiscount = discount ? totalSum - (totalSum * discount / 100) : totalSum;
+    const discountPercentForBonuses = (bonusValueToSpend / totalSumAfterDiscount) * 100;
+
     const updatedPositions = productDetails.map((position) => {
       const productPathName = position.productDetails.pathName || "";
 
-      if (position.restrictCashback) {
-        const discountPercent = (bonusValueToSpend / totalSum) * 100;
-        const discountedPrice = position.price - (position.price * discountPercent) / 100;
+      const priceAfterDiscount = discount ? position.price - (position.price * discount / 100) : position.price;
+      const finalPriceAfterBonuses = priceAfterDiscount - (priceAfterDiscount * discountPercentForBonuses / 100);
 
+      if (position.restrictCashback) {
         return {
           assortment: position.assortment,
           quantity: position.quantity,
           price: position.price.toFixed(2),
-          discountPercent: discountPercent.toFixed(2),
-          discountedPrice: discountedPrice.toFixed(2),
+          discountPercent: discountPercentForBonuses.toFixed(2),
+          discountedPrice: finalPriceAfterBonuses.toFixed(2),
           bonusValueToEarn: 0
         };
       }
 
       const limitedEarnPercent = position.fixedCashback !== null ? position.fixedCashback : (isLimitedCategory(productPathName) ? 5 : earnPercent);
 
-      const discountPercent = (bonusValueToSpend / totalSum) * 100;
-      const discountedPrice = position.price - (position.price * discountPercent) / 100;
-
-      const bonusValueToEarn = Math.round((discountedPrice * position.quantity * limitedEarnPercent) / 100);
+      const bonusValueToEarn = Math.round((finalPriceAfterBonuses * position.quantity * limitedEarnPercent) / 100);
 
       return {
         assortment: position.assortment,
         quantity: position.quantity,
         price: position.price.toFixed(2),
-        discountPercent: discountPercent.toFixed(2),
-        discountedPrice: discountedPrice.toFixed(2),
+        discountPercent: discountPercentForBonuses.toFixed(2),
+        discountedPrice: finalPriceAfterBonuses.toFixed(2),
         bonusValueToEarn 
       };
     });
