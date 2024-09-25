@@ -2,7 +2,7 @@ const express = require("express");
 const axios = require("axios");
 const app = express();
 
-const TOKEN = "e8d72cbb586832eb3715b04ce61e17cda8d65048";
+const TOKEN = "0c4181afe9dd6c0db62b1fc0ab2a5f7cfc341bac";
 
 app.use(express.json());
 
@@ -119,6 +119,7 @@ app.post("/roman/retaildemand/recalc", async (req, res) => {
 
     const bonusBalance = bonusField ? bonusField.value : 0;
     const tags = counterparty.tags || [];
+    const salesAmount = counterparty.salesAmount / 100;
 
     let earnPercent = 0;
     let maxBonusSpendPercent = 0;
@@ -126,6 +127,18 @@ app.post("/roman/retaildemand/recalc", async (req, res) => {
 
     if (tags.includes("сотрудник")) {
       discount = 20;
+    } else if (tags.includes("алексфитнесс")) {
+      discount = 15;
+    } else if (tags.includes("premium")) {
+      discount = 10;
+    } else if (tags.includes("vip")) {
+      discount = 5;
+    } else if (tags.includes("покупатель") && salesAmount >= 15000) {
+      discount = 10;
+    } else if ((tags.includes("vip") || tags.includes("покупатель")) && salesAmount >= 5000) {
+      discount = 5;
+    } else if (tags.includes("тренер")) {
+      discount = 5;
     } else if (tags.includes("партнер")) {
       earnPercent = 20;
       maxBonusSpendPercent = 50;
@@ -170,7 +183,7 @@ app.post("/roman/retaildemand/recalc", async (req, res) => {
     });
 
     const isLimitedCategory = (pathName) => {
-      return pathName === "кондитерка" || pathName === "напитки";
+      return pathName === "Кондитерка" || pathName === "Напиток";
     };
 
     if (bonusProgram.transactionType === "EARNING") {
