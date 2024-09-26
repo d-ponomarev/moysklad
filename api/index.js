@@ -2,7 +2,7 @@ const express = require("express");
 const axios = require("axios");
 const app = express();
 
-const TOKEN = "cb38fac1d69fb3221f55f4216cd7be9532392880";
+const TOKEN = "222e2994683792780a453d7b9a5d929b6a0d7b40";
 
 app.use(express.json());
 
@@ -384,13 +384,13 @@ app.post("/roman/retaildemand", async (req, res) => {
     } else {
       bonusField = {
         meta: {
-          href: "https://api.moysklad.ru/api/remap/1.2/entity/counterparty/metadata/attributes/783e30d6-7c1d-11ef-0a80-092100183622",
+          href: "https://api.moysklad.ru/api/remap/1.2/entity/counterparty/metadata/attributes/42b42262-7a6b-11ef-0a80-040c00423204",
           type: "attributemetadata",
           mediaType: "application/json"
         },
-        id: "783e30d6-7c1d-11ef-0a80-092100183622",
+        id: "42b42262-7a6b-11ef-0a80-040c00423204",
         name: "Бонус",
-        type: "string",
+        type: "long",
         required: false,
         value: (retaildemand.bonusProgram.bonusValueToEarn - retaildemand.bonusProgram.bonusValueToSpend).toString()
       };
