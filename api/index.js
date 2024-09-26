@@ -364,7 +364,8 @@ app.post("/roman/retaildemand", async (req, res) => {
     if (counterparty.attributes && counterparty.attributes.length > 0) {
       bonusField = counterparty.attributes.find((attr) => attr.name === "Бонус");
       if (bonusField) {
-        bonusField.value = bonusField.value - retaildemand.bonusProgram.bonusValueToSpend + retaildemand.bonusProgram.bonusValueToEarn;
+        const updatedBonusValue = bonusField.value - retaildemand.bonusProgram.bonusValueToSpend + retaildemand.bonusProgram.bonusValueToEarn;
+        bonusField.value = updatedBonusValue.toString();
       }
     }
 
