@@ -361,10 +361,23 @@ app.post("/roman/retaildemand", async (req, res) => {
     let updatedTags = [...tags];
 
     let bonusField = null;
+    let bonusBalance = 0;
+
     if (counterparty.attributes && counterparty.attributes.length > 0) {
       bonusField = counterparty.attributes.find((attr) => attr.name === "Бонус");
       if (bonusField) {
-        const updatedBonusValue = bonusField.value - retaildemand.bonusProgram.bonusValueToSpend + retaildemand.bonusProgram.bonusValueToEarn;
+        if (typeof bonusField.value === 'string') {
+          const bonusValue = bonusField.value.trim();
+          if (bonusValue === "None" || bonusValue === "-") {
+            bonusBalance = 0;
+          } else if (!isNaN(parseFloat(bonusValue))) {
+            bonusBalance = Math.round(parseFloat(bonusValue));
+          }
+        } else if (typeof bonusField.value === 'number') {
+          bonusBalance = Math.round(bonusField.value);
+        }
+
+        const updatedBonusValue = bonusBalance - retaildemand.bonusProgram.bonusValueToSpend + retaildemand.bonusProgram.bonusValueToEarn;
         bonusField.value = updatedBonusValue.toString();
       }
     }
