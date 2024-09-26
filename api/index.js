@@ -2,7 +2,7 @@ const express = require("express");
 const axios = require("axios");
 const app = express();
 
-const TOKEN = "9dba4095bc0e6479a7c699d4ed3e9d3a46b2a575";
+const TOKEN = "cb38fac1d69fb3221f55f4216cd7be9532392880";
 
 app.use(express.json());
 
@@ -75,12 +75,12 @@ app.post("/roman/counterparty/detail", async (req, res) => {
     if (counterparty && counterparty.id) {
       let bonusField = null;
       if (counterparty.attributes && counterparty.attributes.length > 0) {
-        bonusField = counterparty.attributes.find((attr) => attr.name === "Бонусы");
+        bonusField = counterparty.attributes.find((attr) => attr.name === "Бонус");
       }
 
       res.status(200).json({
         bonusProgram: {
-          agentBonusBalance: bonusField ? bonusField.value : 0,
+          agentBonusBalance: bonusField ? (isNaN(parseFloat(bonusField.value)) ? 0 : Math.round(parseFloat(bonusField.value))) : 0,
         },
       });
     } else {
@@ -115,10 +115,21 @@ app.post("/roman/retaildemand/recalc", async (req, res) => {
 
     let bonusField = null;
     if (counterparty.attributes && counterparty.attributes.length > 0) {
-      bonusField = counterparty.attributes.find((attr) => attr.name === "Бонусы");
+      bonusField = counterparty.attributes.find((attr) => attr.name === "Бонус");
     }
 
-    const bonusBalance = bonusField ? bonusField.value : 0;
+    let bonusBalance = 0;
+    if (bonusField && typeof bonusField.value === 'string') {
+      const bonusValue = bonusField.value.trim();
+      if (bonusValue === "None" || bonusValue === "-") {
+        bonusBalance = 0;
+      } else if (!isNaN(parseFloat(bonusValue))) {
+        bonusBalance = Math.round(parseFloat(bonusValue));
+      }
+    } else if (bonusField && typeof bonusField.value === 'number') {
+      bonusBalance = Math.round(bonusField.value);
+    }
+    
     const tags = counterparty.tags || [];
 
     let earnPercent = 5;
@@ -351,7 +362,7 @@ app.post("/roman/retaildemand", async (req, res) => {
 
     let bonusField = null;
     if (counterparty.attributes && counterparty.attributes.length > 0) {
-      bonusField = counterparty.attributes.find((attr) => attr.name === "Бонусы");
+      bonusField = counterparty.attributes.find((attr) => attr.name === "Бонус");
       if (bonusField) {
         bonusField.value = bonusField.value - retaildemand.bonusProgram.bonusValueToSpend + retaildemand.bonusProgram.bonusValueToEarn;
       }
