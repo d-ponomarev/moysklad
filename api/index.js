@@ -36,14 +36,14 @@ app.get("/roman/counterparty", async (req, res) => {
 
     const counterparty = response.data;
 
-    if (counterparty && counterparty.rows && counterparty.rows.id) {
+    if (counterparty && counterparty.rows && counterparty.rows[0].id) {
       res.status(200).json({
         rows: [
           {
-            id: counterparty.rows.id,
-            name: counterparty.rows.name,
-            discountCardNumber: counterparty.rows.discountCardNumber,
-            phone: counterparty.rows.phone
+            id: counterparty.rows[0].id,
+            name: counterparty.rows[0].name,
+            discountCardNumber: counterparty.rows[0].discountCardNumber,
+            phone: counterparty.rows[0].phone
           },
         ],
       });
