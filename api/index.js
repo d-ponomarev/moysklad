@@ -2,7 +2,7 @@ const express = require("express");
 const axios = require("axios");
 const app = express();
 
-const TOKEN = "956689e54fd4dafe4fddddb02cb33ceb3620ea6b";
+const TOKEN = "222e2994683792780a453d7b9a5d929b6a0d7b40";
 
 app.use(express.json());
 
