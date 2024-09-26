@@ -8,27 +8,27 @@
   ],
   "routes": [
     {
-      "src": "/counterparty/detail",
+      "src": "roman/counterparty/detail",
       "dest": "/api/index.js",
       "methods": ["POST"]
     },
     {
-      "src": "/retaildemand/recalc",
+      "src": "roman/retaildemand/recalc",
       "dest": "/api/index.js",
       "methods": ["POST"]
     },
     {
-      "src": "/retaildemand/create",
+      "src": "roman/retaildemand/create",
       "dest": "/api/index.js",
       "methods": ["POST"]
     },
     {
-      "src": "/retaildemand",
+      "src": "roman/retaildemand",
       "dest": "/api/index.js",
       "methods": ["POST"]
     },
     {
-      "src": "/counterparty",
+      "src": "roman/counterparty",
       "dest": "/api/index.js",
       "methods": ["GET"]
     }
