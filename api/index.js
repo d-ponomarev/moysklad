@@ -365,21 +365,35 @@ app.post("/roman/retaildemand", async (req, res) => {
 
     if (counterparty.attributes && counterparty.attributes.length > 0) {
       bonusField = counterparty.attributes.find((attr) => attr.name === "Бонус");
-      if (bonusField) {
-        if (typeof bonusField.value === 'string') {
-          const bonusValue = bonusField.value.trim();
-          if (bonusValue === "None" || bonusValue === "-") {
-            bonusBalance = 0;
-          } else if (!isNaN(parseFloat(bonusValue))) {
-            bonusBalance = Math.round(parseFloat(bonusValue));
-          }
-        } else if (typeof bonusField.value === 'number') {
-          bonusBalance = Math.round(bonusField.value);
-        }
+    }
 
-        const updatedBonusValue = bonusBalance - retaildemand.bonusProgram.bonusValueToSpend + retaildemand.bonusProgram.bonusValueToEarn;
-        bonusField.value = updatedBonusValue.toString();
+    if (bonusField) {
+      if (typeof bonusField.value === 'string') {
+        const bonusValue = bonusField.value.trim();
+        if (bonusValue === "None" || bonusValue === "-") {
+          bonusBalance = 0;
+        } else if (!isNaN(parseFloat(bonusValue))) {
+          bonusBalance = Math.round(parseFloat(bonusValue));
+        }
+      } else if (typeof bonusField.value === 'number') {
+        bonusBalance = Math.round(bonusField.value);
       }
+
+      const updatedBonusValue = bonusBalance - retaildemand.bonusProgram.bonusValueToSpend + retaildemand.bonusProgram.bonusValueToEarn;
+      bonusField.value = updatedBonusValue.toString();
+    } else {
+      bonusField = {
+        meta: {
+          href: "https://api.moysklad.ru/api/remap/1.2/entity/counterparty/metadata/attributes/783e30d6-7c1d-11ef-0a80-092100183622",
+          type: "attributemetadata",
+          mediaType: "application/json"
+        },
+        id: "783e30d6-7c1d-11ef-0a80-092100183622",
+        name: "Бонус",
+        type: "string",
+        required: false,
+        value: (retaildemand.bonusProgram.bonusValueToEarn - retaildemand.bonusProgram.bonusValueToSpend).toString()
+      };
     }
 
     let groupChanged = false;
