@@ -25,7 +25,7 @@ app.get("/roman/counterparty", async (req, res) => {
 
   try {
     const response = await axios.get(
-      `https://api.moysklad.ru/api/remap/1.2/entity/counterparty/${search}`,
+      `https://api.moysklad.ru/api/remap/1.2/entity/counterparty?search=${search}`,
       {
         headers: {
           Authorization: `Bearer ${TOKEN}`,
@@ -43,6 +43,7 @@ app.get("/roman/counterparty", async (req, res) => {
             id: counterparty.id,
             name: counterparty.name,
             discountCardNumber: counterparty.discountCardNumber,
+            phone: counterparty.phone
           },
         ],
       });
